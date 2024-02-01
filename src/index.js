@@ -8,24 +8,6 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    /* children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/music",
-        element: <Music />,
-      },
-      {
-        path: "/gallery",
-        element: <Gallery />,
-      },
-      {
-        path: "/press-kit",
-        element: <PressKit />,
-      },
-    ], */
   },
 ]);
 
