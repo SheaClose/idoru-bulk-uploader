@@ -1,40 +1,19 @@
 :root {
-  --ags-white: #dad6d6;
-  --ags-black: #030003;
-  /* violet */
-  --ags-violet-lightest: color-mix(in srgb, var(--ags-violet), #fff 45%);
-  --ags-violet-lighter: color-mix(in srgb, var(--ags-violet), #fff 30%);
-  --ags-violet-light: color-mix(in srgb, var(--ags-violet), #fff 15%);
-  --ags-violet: #470047;
-  --ags-violet-dark: color-mix(in srgb, var(--ags-violet), #000 15%);
-  --ags-violet-darker: color-mix(in srgb, var(--ags-violet), #000 30%);
-  --ags-violet-darkest: color-mix(in srgb, var(--ags-violet), #000 45%);
-  --ags-violet-darker-still: color-mix(in srgb, var(--ags-violet), #000 55%);
-  /* green */
-  --ags-green-lightest: color-mix(in srgb, var(--ags-green), #fff 45%);
-  --ags-green-lighter: color-mix(in srgb, var(--ags-green), #fff 30%);
-  --ags-green-light: color-mix(in srgb, var(--ags-green), #fff 15%);
-  --ags-green: #6bd425;
-  --ags-green-dark: color-mix(in srgb, var(--ags-green), #000 15%);
-  --ags-green-darker: color-mix(in srgb, var(--ags-green), #000 30%);
-  --ags-green-darkest: color-mix(in srgb, var(--ags-green), #000 45%);
-  /* grey */
-  --ags-grey-lightest: color-mix(in srgb, var(--ags-grey), #fff 45%);
-  --ags-grey-lighter: color-mix(in srgb, var(--ags-grey), #fff 30%);
-  --ags-grey-light: color-mix(in srgb, var(--ags-grey), #fff 15%);
-  --ags-grey: #a7a2a9;
-  --ags-grey-dark: color-mix(in srgb, var(--ags-grey), #000 15%);
-  --ags-grey-darker: color-mix(in srgb, var(--ags-grey), #000 30%);
-  --ags-grey-darkest: color-mix(in srgb, var(--ags-grey), #000 45%);
+  --white: #FFFFFF;
+  --black: #000000;
+  --charcoal: #191919;
+  --pink: #ed145b;
+  --pink-100: #f2437c;
+  --pink-900: #c83782;
+  --btn: #2a2b33;
+  --btn-hover:#39353c;
+  --btn-text: #888890;
+  --btn-text-hover: #e4e6ed;
 }
 
 .app {
-  background-color: var(--ags-black);
+  background-color: #191919;
   overflow: auto;
   position: relative;
   height: 100vh;
-}
-
-.app-content {
-  position: relative;
 }
