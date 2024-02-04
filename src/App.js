@@ -225,7 +225,7 @@ function App() {
                       <option value=""></option>
                       <option value="PlayNext">Play Next</option>
                       <option value="QueueNext">Queue Next</option>
-                      <option value="Wait">Wait</option>
+                      <option value="Loop">Loop</option>
                     </select>
                   </FormFieldWrapper>
                 </div>
