@@ -37,3 +37,4 @@ build/
 # MacOS hidden folders
 .DS_Store
 
+src/resources/All Songs.json
