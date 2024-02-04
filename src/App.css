@@ -3,9 +3,11 @@
   --black: #000000;
   --charcoal: #191919;
   --pink: #ed145b;
-  --pink-100: #f2437c;
-  --pink-900: #c83782;
+  --pink-lighter: #f2437c;
+  --pink-darker: #c83782;
   --btn: #2a2b33;
+  --btn-darker: color-mix(in srgb, var(--btn), #000 10%);
+  --btn-lighter: color-mix(in srgb, var(--btn), #fff 10%);
   --btn-hover: #39353c;
   --btn-text: #888890;
   --btn-text-hover: #e4e6ed;
