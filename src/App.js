@@ -46,7 +46,7 @@ function App() {
               <option disabled key={"null"} value="">
                 Set Lists
               </option>
-              {session.playlists.map((playlist) => (
+              {session?.playlists.map((playlist) => (
                 <option key={playlist.id} value={playlist.id}>
                   {playlist.name}
                 </option>
