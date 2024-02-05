@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import idoruLogo from "./resources/Idoru-Logo-word_Dark.png";
 import Button from "./Components/Button";
 import FileImport from "./Components/FileImport";
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
+import useSetStorage from "./utils/useSetStorage";
+
 function App() {
-  const [session, setSession] = useState(
-    JSON.parse(localStorage.getItem("iP1Session"))
-  );
+  const [session, setSession] = useSetStorage();
   let { playListId } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    localStorage.setItem("iP1Session", JSON.stringify(session));
-  }, [session]);
-
   const handleImport = (e) => {
     if (!e?.target?.files?.length) return;
     const fileReader = new FileReader();
     fileReader.onload = function (e) {
       const text = e.target.result;
       setSession(JSON.parse(text));
+      navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
     };
     fileReader.readAsText(e?.target?.files[0]);
   };
@@ -48,7 +44,7 @@ function App() {
               </option>
               {session?.playlists.map((playlist) => (
                 <option key={playlist.id} value={playlist.id}>
-                  {playlist.name}
+                  {playlist?.name}
                 </option>
               ))}
             </select>
@@ -69,6 +65,7 @@ function App() {
                 playlists: [],
                 songs: [],
               });
+              navigate("/");
             }}
           />
           <FileImport

@@ -1,27 +1,19 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import Input from "../Components/Input";
 import FormFieldWrapper from "../Components/FormFieldWrapper";
 import { Playlist, Note, Help, Folder } from "../Components/Icons";
-import { set, get } from "lodash";
+import { get } from "lodash";
 import Accordian from "../Components/Accordian";
-
+import useSetStorage from "../utils/useSetStorage";
 const PlayList = () => {
   let { playListId } = useParams();
-  const [session, setSession] = useState(
-    JSON.parse(localStorage.getItem("iP1Session"))
-  );
+  const [session, setSession] = useSetStorage();
   const playlistIndex = session.playlists.findIndex(
     ({ id }) => id === playListId
   );
-
   const playlist = session.playlists[playlistIndex];
-  const handleSetSession = (path, value) => {
-    setSession(set({ ...session }, path, value));
-  };
-  useEffect(() => {
-    localStorage.setItem("iP1Session", JSON.stringify(session));
-  }, [session]);
+
   const songsById = useMemo(() => {
     if (!session?.songs) return;
     const songsById = session.songs.reduce((acc, song) => {
@@ -40,12 +32,9 @@ const PlayList = () => {
               id="session-name"
               name="session-name"
               type="text"
-              value={playlist.name}
+              value={playlist?.name}
               onChange={(e) => {
-                handleSetSession(
-                  `playlists[${playlistIndex}].name`,
-                  e.target.value
-                );
+                setSession(`playlists[${playlistIndex}].name`, e.target.value);
               }}
             />
           </FormFieldWrapper>
@@ -68,7 +57,7 @@ const PlayList = () => {
                   session?.playlists?.[playlistIndex]?.filePath || ""
                 }
                 onChange={(e) => {
-                  handleSetSession(
+                  setSession(
                     `playlists[${playlistIndex}].filePath`,
                     e?.target?.value
                   );
@@ -107,12 +96,9 @@ const PlayList = () => {
                     placeholder="Song Title"
                     id="song-title"
                     type="text"
-                    value={song.name}
+                    value={song?.name}
                     onChange={(e) => {
-                      handleSetSession(
-                        `songs[${songIndex}].name`,
-                        e.target.value
-                      );
+                      setSession(`songs[${songIndex}].name`, e.target.value);
                     }}
                   />
                 </FormFieldWrapper>
@@ -123,7 +109,7 @@ const PlayList = () => {
                     className="p-4 bg-[--btn] w-96 rounded-md"
                     value={song.endOfSong}
                     onChange={(e) => {
-                      handleSetSession(
+                      setSession(
                         `songs[${songIndex}].endOfSong`,
                         e.target.value
                       );
@@ -145,10 +131,7 @@ const PlayList = () => {
                     type="text"
                     value={song.bpm}
                     onChange={(e) => {
-                      handleSetSession(
-                        `songs[${songIndex}].bpm`,
-                        +e.target.value
-                      );
+                      setSession(`songs[${songIndex}].bpm`, +e.target.value);
                     }}
                   />
                 </FormFieldWrapper>
@@ -171,7 +154,7 @@ const PlayList = () => {
                           type="text"
                           value={inputFile.displayName || songFileId}
                           onChange={(e) => {
-                            handleSetSession(
+                            setSession(
                               `songs[${songIndex}].inputFiles[${songFileId}].displayName`,
                               e?.target?.value?.toUpperCase()
                             );
