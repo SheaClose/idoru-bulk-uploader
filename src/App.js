@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import idoruLogo from "./resources/Idoru-Logo-word_Dark.png";
 import Button from "./Components/Button";
 import FileImport from "./Components/FileImport";
-import { useParams, useNavigate, Outlet } from "react-router-dom";
+import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import useSetStorage from "./utils/useSetStorage";
 
 function App() {
-  const [session, setSession] = useSetStorage();
+  const { session, setSession } = useSetStorage();
   let { playListId } = useParams();
   const navigate = useNavigate();
+  let { pathname } = useLocation();
+
   const handleImport = (e) => {
     if (!e?.target?.files?.length) return;
     const fileReader = new FileReader();
@@ -21,6 +23,14 @@ function App() {
     };
     fileReader.readAsText(e?.target?.files[0]);
   };
+
+  useEffect(() => {
+    if (pathname === "/" && session?.playlists?.length) {
+      // if landing on root, but playlists exist, go ahead and load first playlist
+      navigate(`/setlist/${session.playlists?.[0]?.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="app">
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
@@ -71,7 +81,7 @@ function App() {
           <FileImport
             onFileUpload={handleImport}
             label="Import"
-            accept=".idoru"
+            accept=".idoru,.json"
           />
         </div>
       </nav>

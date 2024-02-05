@@ -3,78 +3,46 @@ import React from "react";
 const Checkbox = ({ isChecked, onChecked, verticalOffset }) => {
   return (
     <>
-      <label className="container">
+      <label
+        className="
+          container h-4 relative cursor-pointer
+          hover:[&_span]:bg-[--btn-text-hover]
+          /* when checkbox is selected, set background color = pink */
+          [&_input:checked~span]:bg-[--pink]
+          /* initially the check in the checkbox is display: hidden, when checked, turn it on */
+          after:[&_input:checked~span]:block
+        "
+      >
         <input
           checked={isChecked}
           onChange={(e) => onChecked(e?.target?.checked)}
           type="checkbox"
+          className="absolute opacity-0 cursor-pointer h-0 w-0"
         />
         <span
           style={{
             top: verticalOffset ? verticalOffset : "0px",
           }}
-          className="checkmark"
+          className="
+            /* style the checkbox-container */
+            absolute left-0 h-3 w-3 bg-white
+            /* style the checkmark */
+            after:content-['']
+            after:absolute after:hidden
+            after:border-white
+            after:border-solid
+            after:left-1
+            after:top-0.5
+            after:w-1
+            after:h-2
+            after:border-t-[0px]
+            after:border-r-[3px]
+            after:border-b-[3px]
+            after:border-l-[0px]
+            after:rotate-45
+          "
         ></span>
       </label>
-      <style jsx="true">{`
-        /* The container */
-        .container {
-          display: inline-block;
-          position: relative;
-          cursor: pointer;
-        }
-
-        /* Hide the browser's default checkbox */
-        .container input {
-          position: absolute;
-          opacity: 0;
-          cursor: pointer;
-          height: 0;
-          width: 0;
-        }
-
-        /* Create a custom checkbox */
-        .checkmark {
-          position: absolute;
-          left: 0;
-          height: 14px;
-          width: 14px;
-          background-color: #fff;
-        }
-
-        /* On mouse-over, add a grey background color */
-        .container:hover input ~ .checkmark {
-          background-color: var(--btn-text-hover);
-        }
-
-        /* When the checkbox is checked, add a blue background */
-        .container input:checked ~ .checkmark {
-          background-color: var(--pink);
-        }
-
-        /* Create the checkmark/indicator (hidden when not checked) */
-        .checkmark:after {
-          content: "";
-          position: absolute;
-          display: none;
-        }
-
-        /* Show the checkmark when checked */
-        .container input:checked ~ .checkmark:after {
-          display: block;
-        }
-
-        /* Style the checkmark/indicator */
-        .container .checkmark:after {
-          left: 5px;
-          top: 2.5px;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 3px 3px 0;
-          transform: rotate(45deg);
-        }
-      `}</style>
     </>
   );
 };
