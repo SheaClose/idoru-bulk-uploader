@@ -12,7 +12,6 @@ function useSetStorage() {
 
   const handleSetSession = (path, value) => {
     if (!value) {
-      console.log("path: ", path);
       // no path is given, just a value, rename path to value;
       value = path;
       setSession(path);
