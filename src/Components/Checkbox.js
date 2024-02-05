@@ -1,6 +1,12 @@
 import React from "react";
 
-const Checkbox = ({ isChecked, onChecked, verticalOffset }) => {
+const Checkbox = ({
+  checkboxName,
+  isChecked,
+  onChecked,
+  verticalOffset,
+  disabled,
+}) => {
   return (
     <>
       <label
@@ -9,13 +15,20 @@ const Checkbox = ({ isChecked, onChecked, verticalOffset }) => {
           hover:[&_span]:bg-[--btn-text-hover]
           /* when checkbox is selected, set background color = pink */
           [&_input:checked~span]:bg-[--pink]
+          /* when input focused, give visual queue like other inputs */
+          [&_input:focus~span]:ring-1
+          [&_input:focus~span]:ring-white
+          /* when input disabled, darken */
+          [&_input:disabled~span]:bg-[--btn-text]
           /* initially the check in the checkbox is display: hidden, when checked, turn it on */
           after:[&_input:checked~span]:block
         "
       >
         <input
+          disabled={disabled}
+          name={checkboxName}
           checked={isChecked}
-          onChange={(e) => onChecked(e?.target?.checked)}
+          onChange={(e) => onChecked(e?.target?.name, e?.target?.checked)}
           type="checkbox"
           className="absolute opacity-0 cursor-pointer h-0 w-0"
         />

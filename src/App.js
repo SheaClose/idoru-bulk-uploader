@@ -18,7 +18,7 @@ function App() {
     const fileReader = new FileReader();
     fileReader.onload = function (e) {
       const text = e.target.result;
-      setSession(JSON.parse(text));
+      setSession("", JSON.parse(text));
       navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
     };
     fileReader.readAsText(e?.target?.files[0]);
@@ -63,7 +63,7 @@ function App() {
             label="Save"
             theme={"secondary"}
             onClick={() => {
-              setSession({
+              setSession("", {
                 session: {
                   checkMissingFiles: false,
                   deviceImport: false,

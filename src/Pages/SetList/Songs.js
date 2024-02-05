@@ -79,12 +79,12 @@ const Songs = () => {
           >
             {Object.entries(song.inputFiles)
               .slice(0, 6)
-              .map(([songFileId, inputFile]) => {
+              .map(([songFileId, inputFile], index) => {
                 return (
                   <Track
+                    inputId={`IN${index + 1}`}
                     key={inputFile.id}
                     songFileId={songFileId}
-                    song={song}
                     inputFile={inputFile}
                     songIndex={songIndex}
                   />
