@@ -9,10 +9,10 @@ import Songs from "./Songs";
 const PlayList = () => {
   let { playListId } = useParams();
   const { session, setSession } = useSetStorage();
-  const playlistIndex = session.playlists.findIndex(
+  const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
-  const playlist = session.playlists[playlistIndex];
+  const playlist = session?.playlists?.[playlistIndex];
 
   return (
     <div className="w-full text-white p-8">

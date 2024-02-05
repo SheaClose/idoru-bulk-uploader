@@ -9,10 +9,10 @@ import Track from "./Track";
 const Songs = () => {
   let { playListId } = useParams();
   const { session, setSession, songsById } = useSetStorage();
-  const playlistIndex = session.playlists.findIndex(
+  const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
-  const playlist = session.playlists[playlistIndex];
+  const playlist = session?.playlists?.[playlistIndex];
 
   return (
     <>
