@@ -4,10 +4,10 @@ import Checkbox from "../../Components/Checkbox";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
-import useSetStorage from "../../utils/useSetStorage";
+import { useOutletContext } from "react-router-dom";
 
 const Track = ({ inputId, songFileId, songIndex }) => {
-  const { session, setSession } = useSetStorage();
+  const [session, setSession] = useOutletContext();
   const song = session?.songs[songIndex];
 
   const activeOutputs =

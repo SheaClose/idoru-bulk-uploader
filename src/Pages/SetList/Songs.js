@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import Accordian from "../../Components/Accordian";
-import useSetStorage from "../../utils/useSetStorage";
 import Track from "./Track";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-
+import { useOutletContext } from "react-router-dom";
 const Songs = () => {
   let { playListId } = useParams();
-  const { session, setSession, songsById } = useSetStorage();
+  const [session, setSession, songsById] = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );

@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { Playlist, Help, Folder } from "../../Components/Icons";
-import useSetStorage from "../../utils/useSetStorage";
+import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 
 const PlayList = () => {
   let { playListId } = useParams();
-  const { session, setSession } = useSetStorage();
+  const [session, setSession] = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
