@@ -6,7 +6,7 @@ import { HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
 import useSetStorage from "../../utils/useSetStorage";
 
-const Track = ({ inputId, inputFile, songFileId, songIndex }) => {
+const Track = ({ inputId, songFileId, songIndex }) => {
   const { session, setSession } = useSetStorage();
   const song = session?.songs[songIndex];
 
@@ -32,10 +32,9 @@ const Track = ({ inputId, inputFile, songFileId, songIndex }) => {
   };
 
   const trackDisbaled = !song?.inputFiles?.[songFileId]?.fileName?.length;
-
   const checkBoxConfig = [
     {
-      containerClass: "flex flex-col gap-1 justify-between mr-2 pr-4",
+      containerClass: "flex flex-col gap-1 justify-between mr-2 pr-3",
       containerStyle: {
         borderRight: "3px solid var(--btn-lighter)",
       },
@@ -80,7 +79,7 @@ const Track = ({ inputId, inputFile, songFileId, songIndex }) => {
             maxLength="2"
             id="track-title"
             type="text"
-            value={inputFile.displayName || songFileId}
+            value={song?.inputFiles?.[songFileId]?.displayName || songFileId}
             onChange={(e) => {
               setSession(
                 `songs[${songIndex}].inputFiles[${songFileId}].displayName`,
@@ -105,38 +104,38 @@ const Track = ({ inputId, inputFile, songFileId, songIndex }) => {
             onChange={null}
           />
         </FormFieldWrapper>
-      </div>
-      <div className="flex gap-2 pl-8 pt-2">
-        {checkBoxConfig.map(
-          (
-            {
-              containerClass,
-              containerStyle,
-              spanClass,
-              spanChild,
-              checkBoxName,
-            },
-            index
-          ) => {
-            return (
-              <div
-                key={`${inputId}-${index}`}
-                className={containerClass}
-                style={containerStyle || {}}
-              >
-                <span className={spanClass}>
-                  {spanChild ? spanChild : `${index}.`}
-                </span>
-                <Checkbox
-                  disabled={trackDisbaled}
-                  checkboxName={checkBoxName}
-                  isChecked={activeOutputs[checkBoxName]}
-                  onChecked={handleSetCheckBoxValue}
-                />
-              </div>
-            );
-          }
-        )}
+        <div className="flex gap-2">
+          {checkBoxConfig.map(
+            (
+              {
+                containerClass,
+                containerStyle,
+                spanClass,
+                spanChild,
+                checkBoxName,
+              },
+              index
+            ) => {
+              return (
+                <div
+                  key={`${inputId}-${index}`}
+                  className={containerClass}
+                  style={containerStyle || {}}
+                >
+                  <span className={spanClass}>
+                    {spanChild ? spanChild : `${index}.`}
+                  </span>
+                  <Checkbox
+                    disabled={trackDisbaled}
+                    checkboxName={checkBoxName}
+                    isChecked={activeOutputs[checkBoxName]}
+                    onChecked={handleSetCheckBoxValue}
+                  />
+                </div>
+              );
+            }
+          )}
+        </div>
       </div>
     </div>
   );

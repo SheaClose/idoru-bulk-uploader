@@ -38,4 +38,4 @@ build/
 .DS_Store
 
 src/resources/All Songs.json
-src/resources/TestSession.json
+src/resources/TestSession*

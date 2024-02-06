@@ -6,6 +6,7 @@ import FileImport from "./Components/FileImport";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import useSetStorage from "./utils/useSetStorage";
+import { DragDropContext } from "react-beautiful-dnd";
 
 function App() {
   const { session, setSession } = useSetStorage();
@@ -31,6 +32,21 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onDragEnd = ({
+    source: { index: sourceIndex },
+    destination: { index: destinationIndex },
+  }) => {
+    const playlistIndex = session?.playlists?.findIndex(
+      ({ id }) => id === playListId
+    );
+    const songs = session?.playlists?.[playlistIndex]?.songs;
+    const newSongs = [...songs];
+    const [songId] = newSongs.splice(sourceIndex, 1);
+    newSongs.splice(destinationIndex, 0, songId);
+    setSession(`playlists[${playlistIndex}].songs`, newSongs);
+  };
+
   return (
     <div className="app">
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
@@ -85,7 +101,9 @@ function App() {
           />
         </div>
       </nav>
-      <Outlet />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Outlet />
+      </DragDropContext>
     </div>
   );
 }
