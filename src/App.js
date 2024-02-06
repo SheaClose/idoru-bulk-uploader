@@ -8,8 +8,18 @@ import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
 import { set } from "lodash";
 function App() {
+  let { playListId } = useParams();
+  const navigate = useNavigate();
+  let { pathname } = useLocation();
   const [session, ogSetSession] = useState(
     JSON.parse(localStorage.getItem("iP1Session"))
+  );
+  const [isIdoruImport, setIsIdoruImport] = useState(
+    JSON.parse(localStorage.getItem("isIdoruImport"))
+  );
+
+  const playlistIndex = session?.playlists?.findIndex(
+    ({ id }) => id === playListId
   );
 
   useEffect(() => {
@@ -54,10 +64,6 @@ function App() {
     return songsById;
   }, [session?.songs]);
 
-  let { playListId } = useParams();
-  const navigate = useNavigate();
-  let { pathname } = useLocation();
-
   const handleImport = (e) => {
     if (!e?.target?.files?.length) return;
     const fileReader = new FileReader();
@@ -65,6 +71,8 @@ function App() {
       const text = e.target.result;
       setSession("", JSON.parse(text));
       navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
+      setIsIdoruImport(true);
+      localStorage.setItem("isIdoruImport", true);
     };
     fileReader.readAsText(e?.target?.files[0]);
   };
@@ -91,6 +99,26 @@ function App() {
     const [songId] = newSongs.splice(sourceIndex, 1);
     newSongs.splice(destinationIndex, 0, songId);
     setSession(`playlists[${playlistIndex}].songs`, newSongs);
+  };
+
+  const handleExport = () => {
+    /*
+      TODO: once drag import is done, address song locations based on:
+        session?.playlists?.[playlistIndex]?.filePath
+      Unless an *.idoru file was used for import.
+    */
+    const fileName = `${session?.session?.name}.idoru`;
+    var element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:application/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(session))
+    );
+    element.setAttribute("download", fileName);
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
@@ -121,24 +149,41 @@ function App() {
               ))}
             </select>
           </FormFieldWrapper>
-          <Button
-            label="Save"
-            theme={"secondary"}
-            onClick={() => {
-              setSession("", {
-                session: {
-                  checkMissingFiles: false,
-                  deviceImport: false,
-                  filePath: "",
-                  id: crypto.randomUUID(),
-                  name: "",
+          {window.location.hostname === "localhost" ? (
+            <Button
+              disabled={
+                isIdoruImport
+                  ? false
+                  : !session?.playlists?.[playlistIndex]?.filePath
+              }
+              label="Reset"
+              theme={"secondary"}
+              onClick={() => {
+                setSession("", {
+                  session: {
+                    checkMissingFiles: false,
+                    deviceImport: false,
+                    filePath: "",
+                    id: crypto.randomUUID(),
+                    name: "",
+                    playlists: [],
+                  },
                   playlists: [],
-                },
-                playlists: [],
-                songs: [],
-              });
-              navigate("/");
-            }}
+                  songs: [],
+                });
+                navigate("/");
+              }}
+            />
+          ) : null}
+          <Button
+            disabled={
+              isIdoruImport
+                ? false
+                : !session?.playlists?.[playlistIndex]?.filePath
+            }
+            label="Export"
+            theme={"secondary"}
+            onClick={handleExport}
           />
           <FileImport
             onFileUpload={handleImport}

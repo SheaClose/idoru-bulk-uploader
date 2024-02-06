@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { Playlist, Help, Folder } from "../../Components/Icons";
@@ -8,11 +8,17 @@ import Songs from "./Songs";
 
 const PlayList = () => {
   let { playListId } = useParams();
+  const navigate = useNavigate();
   const [session, setSession] = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
   const playlist = session?.playlists?.[playlistIndex];
+  useEffect(() => {
+    if (!playlist) {
+      navigate("/");
+    }
+  }, [playlist, navigate]);
 
   return (
     <div className="w-full text-white p-8">
@@ -40,14 +46,7 @@ const PlayList = () => {
                 id="src-path"
                 name="src-path"
                 type="text"
-                value={
-                  /*
-                    This is a temp value. Will be used to fill out songs[:i].inputFiles[:key].directory.
-                    Needs to be cleaned up on save.
-                    TODO: remove this value before exporting *.idoru file.
-                  */
-                  session?.playlists?.[playlistIndex]?.filePath || ""
-                }
+                value={session?.playlists?.[playlistIndex]?.filePath || ""}
                 onChange={(e) => {
                   setSession(
                     `playlists[${playlistIndex}].filePath`,

@@ -36,7 +36,7 @@ const Songs = () => {
                       key={id}
                       header={
                         <div
-                          className="w-full flex items-center gap-4 pl-10 mt-4 relative"
+                          className="w-full flex items-center gap-4 pl-10 py-2 relative"
                           key={id}
                         >
                           <span className="absolute inset-x-2 inset-y-4 w-1">
@@ -94,7 +94,7 @@ const Songs = () => {
                           </FormFieldWrapper>
                           <div
                             {...draggableProvided.dragHandleProps}
-                            className=" border border-[--btn-text-hover] p-1 rounded-md"
+                            className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]"
                           >
                             <DragHandle />
                           </div>
