@@ -7,7 +7,7 @@ const Accordian = ({ header, children, className, isOpen = false }) => {
       <div className={`flex gap-4 items-center ${className}`}>
         <div>{header}</div>
         <div
-          className="pt-4 hover:cursor-pointer"
+          className="mt-4 hover:cursor-pointer border border-[--btn-text-hover] p-1 rounded-md"
           onClick={() => setIsActive(!isActive)}
         >
           {isActive ? <ExpandLess /> : <ExpandMore />}

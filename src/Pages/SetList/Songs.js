@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { DragHandle } from "../../Components/Icons";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import Accordian from "../../Components/Accordian";
@@ -91,6 +92,12 @@ const Songs = () => {
                               }}
                             />
                           </FormFieldWrapper>
+                          <div
+                            {...draggableProvided.dragHandleProps}
+                            className=" border border-[--btn-text-hover] p-1 rounded-md"
+                          >
+                            <DragHandle />
+                          </div>
                         </div>
                       }
                     >
