@@ -32,6 +32,7 @@ const Track = ({ inputId, songFileId, songIndex }) => {
   };
 
   const trackDisbaled = !song?.inputFiles?.[songFileId]?.fileName?.length;
+
   const checkBoxConfig = [
     {
       containerClass: "flex flex-col gap-1 justify-between mr-2 pr-3",
