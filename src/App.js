@@ -6,7 +6,7 @@ import FileImport from "./Components/FileImport";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
-import { set } from "lodash";
+import { flatten, set } from "lodash";
 /* import Modal from "./Components/Modal"; */
 import { FileDrop } from "react-file-drop";
 import { onDrop /* , generateNewTrack */ } from "./resources/parseFiles";
@@ -17,13 +17,30 @@ function App() {
   const [session, ogSetSession] = useState(
     JSON.parse(localStorage.getItem("iP1Session"))
   );
-  const [isIdoruImport, setIsIdoruImport] = useState(
-    JSON.parse(localStorage.getItem("isIdoruImport"))
-  );
 
-  const playlistIndex = session?.playlists?.findIndex(
-    ({ id }) => id === playListId
-  );
+  const setListsNeedingDirectoryPath = useMemo(() => {
+    // if any of the tracks still have a placeholder `directory`,
+    // that set list needs to be updated with a "path to directory"
+    return session.playlists
+      .filter((pL) => {
+        const plSongs = session.songs.filter((song) =>
+          pL.songs.includes(song.id)
+        );
+
+        return flatten(
+          plSongs.map(({ inputFiles }) => Object.values(inputFiles))
+        )
+          ?.map(({ directory }) => directory)
+          ?.some((str) => str.includes("#{directory}"));
+      })
+      ?.map(({ id }) => id);
+  }, [session]);
+
+  const stillNeedingAction = useMemo(() => {
+    return !!setListsNeedingDirectoryPath.filter(
+      (plId) => session.playlists.find(({ id }) => plId).filePath
+    ).length;
+  }, [setListsNeedingDirectoryPath, session.playlists]);
 
   useEffect(() => {
     localStorage.setItem("iP1Session", JSON.stringify(session));
@@ -46,16 +63,19 @@ function App() {
 
     // Multiple values given, itterate over values ([ [path, val], [path, val] ]), then update all at once.
     if (Array.isArray(path)) {
-      const newSession = path.reduce((acc, [nextPath, nextVal]) => {
-        return set(acc, nextPath, nextVal);
-      }, JSON.parse(localStorage.getItem("iP1Session")));
+      const newSession = path.reduce(
+        (acc, [nextPath, nextVal]) => {
+          return set(acc, nextPath, nextVal);
+        },
+        { ...JSON.parse(localStorage.getItem("iP1Session")) }
+      );
       ogSetSession(newSession);
       return;
     }
 
     // expected path value pair given.
     ogSetSession(
-      set(JSON.parse(localStorage.getItem("iP1Session")), path, value)
+      set({ ...JSON.parse(localStorage.getItem("iP1Session")) }, path, value)
     );
   };
 
@@ -74,8 +94,6 @@ function App() {
       const text = e.target.result;
       setSession("", JSON.parse(text));
       navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
-      setIsIdoruImport(true);
-      localStorage.setItem("isIdoruImport", true);
     };
     fileReader.readAsText(e?.target?.files[0]);
   };
@@ -179,18 +197,16 @@ function App() {
               </option>
               {session?.playlists?.map((playlist) => (
                 <option key={playlist?.id} value={playlist?.id}>
-                  {playlist?.name}
+                  {playlist?.name}{" "}
+                  {setListsNeedingDirectoryPath.includes(playlist.id)
+                    ? "*"
+                    : ""}
                 </option>
               ))}
             </select>
           </FormFieldWrapper>
           {window.location.hostname === "localhost" ? (
             <Button
-              disabled={
-                isIdoruImport
-                  ? false
-                  : !session?.playlists?.[playlistIndex]?.filePath
-              }
               label="Reset"
               theme={"secondary"}
               onClick={() => {
@@ -211,11 +227,7 @@ function App() {
             />
           ) : null}
           <Button
-            disabled={
-              isIdoruImport
-                ? false
-                : !session?.playlists?.[playlistIndex]?.filePath
-            }
+            disabled={stillNeedingAction}
             label="Export"
             theme={"secondary"}
             onClick={handleExport}
@@ -235,7 +247,14 @@ function App() {
 
             onDragLeave: function(event): Callback when the user leaves the target. Removes the file-drop-dragging-over-target class from the file-drop-target.
           */}
-          <Outlet context={[session, setSession, songsById]} />
+          <Outlet
+            context={{
+              session,
+              setSession,
+              songsById,
+              setListsNeedingDirectoryPath,
+            }}
+          />
         </FileDrop>
       </DragDropContext>
     </div>

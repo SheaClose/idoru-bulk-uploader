@@ -5,9 +5,15 @@ import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { DragHandle, HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
 import { useOutletContext } from "react-router-dom";
-
-const Track = ({ inputId, songFileId, songIndex, disabled = false }) => {
-  const [session, setSession] = useOutletContext();
+import { Draggable } from "react-beautiful-dnd";
+const Track = ({
+  inputId,
+  songFileId,
+  songIndex,
+  disabled = false,
+  trackIndex,
+}) => {
+  const { session, setSession } = useOutletContext();
   const song = session?.songs[songIndex];
 
   const activeOutputs =
@@ -30,9 +36,8 @@ const Track = ({ inputId, songFileId, songIndex, disabled = false }) => {
       ],
     ]);
   };
-
-  const trackDisbaled =
-    disabled || !song?.inputFiles?.[songFileId]?.fileName?.length;
+  const hasNoTrack = !song?.inputFiles?.[songFileId]?.fileName?.length;
+  const trackDisbaled = disabled || hasNoTrack;
 
   const checkBoxConfig = [
     {
@@ -71,78 +76,99 @@ const Track = ({ inputId, songFileId, songIndex, disabled = false }) => {
   ];
   return (
     <div className="pl-20 mt-4">
-      <div className="flex items-center gap-4">
-        <Note />
-        <FormFieldWrapper id="track-title">
-          <Input
-            disabled={trackDisbaled}
-            placeholder="Display Name"
-            className="w-16"
-            maxLength="2"
-            id="track-title"
-            type="text"
-            value={song?.inputFiles?.[songFileId]?.displayName || songFileId}
-            onChange={(e) => {
-              setSession(
-                `songs[${songIndex}].inputFiles[${songFileId}].displayName`,
-                e?.target?.value?.toUpperCase()
-              );
-            }}
-          />
-        </FormFieldWrapper>
-        <FormFieldWrapper id="track-title">
-          <Input
-            placeholder="Track Name"
-            className="w-48"
-            maxLength="2"
-            id="track-title"
-            type="text"
-            disabled
-            readOnly
-            value={get(
-              session,
-              `songs[${songIndex}].inputFiles[${songFileId}].fileName`
-            )}
-            onChange={null}
-          />
-        </FormFieldWrapper>
-        <div className="flex gap-2">
-          {checkBoxConfig.map(
-            (
-              {
-                containerClass,
-                containerStyle,
-                spanClass,
-                spanChild,
-                checkBoxName,
-              },
-              index
-            ) => {
-              return (
+      <Draggable
+        key={inputId}
+        draggableId={inputId}
+        index={trackIndex}
+        isDragDisabled={hasNoTrack}
+      >
+        {(draggableProvided) => (
+          <div
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+          >
+            <div className="flex items-center gap-4">
+              <Note />
+              <FormFieldWrapper id="track-title">
+                <Input
+                  disabled={trackDisbaled}
+                  placeholder="Display Name"
+                  className="w-16"
+                  maxLength="2"
+                  id="track-title"
+                  type="text"
+                  value={
+                    song?.inputFiles?.[songFileId]?.displayName || songFileId
+                  }
+                  onChange={(e) => {
+                    setSession(
+                      `songs[${songIndex}].inputFiles[${songFileId}].displayName`,
+                      e?.target?.value?.toUpperCase()
+                    );
+                  }}
+                />
+              </FormFieldWrapper>
+              <FormFieldWrapper id="track-title">
+                <Input
+                  placeholder="Track Name"
+                  className="w-48"
+                  maxLength="2"
+                  id="track-title"
+                  type="text"
+                  disabled
+                  readOnly
+                  value={get(
+                    session,
+                    `songs[${songIndex}].inputFiles[${songFileId}].fileName`
+                  )}
+                  onChange={null}
+                />
+              </FormFieldWrapper>
+              <div className="flex gap-2">
+                {checkBoxConfig.map(
+                  (
+                    {
+                      containerClass,
+                      containerStyle,
+                      spanClass,
+                      spanChild,
+                      checkBoxName,
+                    },
+                    index
+                  ) => {
+                    return (
+                      <div
+                        key={`${inputId}-${index}`}
+                        className={containerClass}
+                        style={containerStyle || {}}
+                      >
+                        <span className={spanClass}>
+                          {spanChild ? spanChild : `${index}.`}
+                        </span>
+                        <Checkbox
+                          disabled={trackDisbaled}
+                          checkboxName={checkBoxName}
+                          isChecked={activeOutputs[checkBoxName]}
+                          onChecked={handleSetCheckBoxValue}
+                        />
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+
+              {!hasNoTrack ? (
                 <div
-                  key={`${inputId}-${index}`}
-                  className={containerClass}
-                  style={containerStyle || {}}
+                  {...draggableProvided.dragHandleProps}
+                  className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]"
                 >
-                  <span className={spanClass}>
-                    {spanChild ? spanChild : `${index}.`}
-                  </span>
-                  <Checkbox
-                    disabled={trackDisbaled}
-                    checkboxName={checkBoxName}
-                    isChecked={activeOutputs[checkBoxName]}
-                    onChecked={handleSetCheckBoxValue}
-                  />
+                  <DragHandle />
                 </div>
-              );
-            }
-          )}
-        </div>
-        {/*...draggableProvided.dragHandleProps*/}
-        <div className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]">
-          <DragHandle />
-        </div>
-      </div>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </Draggable>
     </div>
   );
 };

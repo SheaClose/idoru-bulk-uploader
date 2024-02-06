@@ -7,14 +7,42 @@ import Accordian from "../../Components/Accordian";
 import Track from "./Track";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { useOutletContext } from "react-router-dom";
+import { DragDropContext } from "react-beautiful-dnd";
+import { cloneDeep } from "lodash";
+
 const Songs = () => {
   let { playListId } = useParams();
-  const [session, setSession, songsById] = useOutletContext();
+  const { session, setSession, songsById } = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
   const playlist = session?.playlists?.[playlistIndex];
 
+  const handleTrackDrop = ({ source, destination }) => {
+    const songId = destination?.droppableId;
+    const sourceIndex = source?.index;
+    const destinationIndex = destination?.index;
+    if (sourceIndex == null || destinationIndex == null) return; // something went wrong, abandon ship!
+    const songIndex = session.songs.findIndex(({ id }) => id === songId);
+    const song = cloneDeep(session?.songs[songIndex]);
+
+    const tracks = [];
+    for (const track of Object.values(song.inputFiles)) {
+      tracks.push(track);
+    }
+    const [track] = tracks.splice(sourceIndex, 1);
+    tracks.splice(destinationIndex, 0, track);
+    tracks.forEach((track, index) => {
+      const incIndex = index + 1;
+      track.channelName = `Channel ${incIndex}`;
+      if (track.displayName.match(/[F\d]{2}/) != null) {
+        // Update display name if it's still the F[1-n] format.
+        track.displayName = `F${incIndex}`;
+      }
+      song.inputFiles[`F${incIndex}`] = track;
+    });
+    setSession(`songs[${songIndex}]`, song);
+  };
   return (
     <Droppable droppableId={playListId}>
       {(provided) => (
@@ -100,20 +128,33 @@ const Songs = () => {
                         </div>
                       }
                     >
-                      {Object.entries(song.inputFiles)
-                        // .slice(0, 6)
-                        .map(([songFileId, inputFile], index) => {
-                          return (
-                            <Track
-                              disabled={index > 5}
-                              inputId={`IN${index + 1}`}
-                              key={inputFile.id}
-                              songFileId={songFileId}
-                              inputFile={inputFile}
-                              songIndex={songIndex}
-                            />
-                          );
-                        })}
+                      <DragDropContext onDragEnd={handleTrackDrop}>
+                        <Droppable droppableId={song.id}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                            >
+                              {Object.entries(song.inputFiles)
+                                // .slice(0, 6)
+                                .map(([songFileId, inputFile], index) => {
+                                  return (
+                                    <Track
+                                      disabled={index > 5}
+                                      trackIndex={index}
+                                      inputId={`IN${index + 1}`}
+                                      key={inputFile.id}
+                                      songFileId={songFileId}
+                                      inputFile={inputFile}
+                                      songIndex={songIndex}
+                                    />
+                                  );
+                                })}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
                     </Accordian>
                   </div>
                 )}

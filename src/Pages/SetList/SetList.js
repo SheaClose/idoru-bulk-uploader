@@ -5,11 +5,13 @@ import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { Playlist, Help, Folder } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
+import classNames from "classnames";
 
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
-  const [session, setSession] = useOutletContext();
+  const { session, setSession, setListsNeedingDirectoryPath } =
+    useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
@@ -40,7 +42,13 @@ const PlayList = () => {
         <div className="flex items-center gap-4">
           <Folder />
           <FormFieldWrapper id="src-path">
-            <div className="flex items-center relative">
+            <div
+              className={classNames("flex items-center relative", {
+                "ring-1 ring-[--pink]":
+                  setListsNeedingDirectoryPath.includes(playListId) &&
+                  !session?.playlists?.[playlistIndex]?.filePath,
+              })}
+            >
               <Input
                 placeholder="Path to Directory"
                 id="src-path"
@@ -49,6 +57,7 @@ const PlayList = () => {
                 value={session?.playlists?.[playlistIndex]?.filePath || ""}
                 onBlur={(e) => {
                   let filePath = e?.target?.value;
+                  if (!filePath) return;
                   /* ensure file path ends in / */
                   if (!filePath.endsWith("/")) filePath += "/";
                   setSession(`playlists[${playlistIndex}].filePath`, filePath);

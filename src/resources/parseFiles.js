@@ -484,6 +484,7 @@ const songTemplate = {
 
 const sessionTemplate = {
   session: {
+    isBulkUploader: true,
     checkMissingFiles: false,
     deviceImport: false,
     filePath: "",
