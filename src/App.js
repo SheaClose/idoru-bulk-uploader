@@ -7,6 +7,7 @@ import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
 import { set } from "lodash";
+import Modal from "./Components/Modal";
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -123,6 +124,7 @@ function App() {
 
   return (
     <div className="app">
+      <Modal />
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
         <div className="flex gap-4 items-center font-bold text-2xl">
           <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
