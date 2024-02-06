@@ -8,6 +8,9 @@ import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
 import { set } from "lodash";
 import Modal from "./Components/Modal";
+import { FileDrop } from "react-file-drop";
+import { onDrop } from "./resources/parseFiles";
+
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -122,9 +125,16 @@ function App() {
     document.body.removeChild(element);
   };
 
+  const onFrameDrop = (event) => {
+    const { newSession, latestSetlistId } = onDrop(event, session);
+    /* TODO: reset session and navigate to newly imported setlist */
+    // setSession(newSession);
+    // navigate(`/setlist/${latestSetlistId}`);
+  };
+
   return (
     <div className="app">
-      <Modal />
+      {/* <Modal /> */}
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
         <div className="flex gap-4 items-center font-bold text-2xl">
           <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
@@ -195,7 +205,15 @@ function App() {
         </div>
       </nav>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Outlet context={[session, setSession, songsById]} />
+        <FileDrop onFrameDrop={onFrameDrop}>
+          {/* 
+            Todo: Style body based on drag event.
+            onDragOver: function(event): Callback when the user is dragging over the target. Also adds the file-drop-dragging-over-target class to the file-drop-target.
+
+            onDragLeave: function(event): Callback when the user leaves the target. Removes the file-drop-dragging-over-target class from the file-drop-target.
+          */}
+          <Outlet context={[session, setSession, songsById]} />
+        </FileDrop>
       </DragDropContext>
     </div>
   );
