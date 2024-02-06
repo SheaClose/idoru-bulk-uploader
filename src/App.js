@@ -7,10 +7,9 @@ import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
 import { set } from "lodash";
-import Modal from "./Components/Modal";
+/* import Modal from "./Components/Modal"; */
 import { FileDrop } from "react-file-drop";
-import { onDrop } from "./resources/parseFiles";
-
+import { onDrop /* , generateNewTrack */ } from "./resources/parseFiles";
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -111,6 +110,31 @@ function App() {
         session?.playlists?.[playlistIndex]?.filePath
       Unless an *.idoru file was used for import.
     */
+    // session.songs.forEach((song) => {
+    // console.log("song.inputFiles: ", song.inputFiles);
+    // const newF7 = generateNewTrack(7);
+    // newF7.directory = "";
+    // song.inputFiles = Object.entries(song.inputFiles)
+    // .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
+    // .slice(0, 6)
+    // .reduce(
+    // (acc, [key, val]) => {
+    // if (!isIdoruImport) {
+    // /* generate file paths for input files */
+    // val.directory = val.directory.replace(
+    // "#{directory}",
+    // session?.playlists?.[playlistIndex]?.filePath
+    // );
+    // }
+    // return { ...acc, [key]: val };
+    // },
+    // {
+    // F7: newF7,
+    // }
+    // );
+    // console.log("new song.inputFiles: ", song.inputFiles);
+    // });
+    /* END cleanup */
     const fileName = `${session?.session?.name}.idoru`;
     var element = document.createElement("a");
     element.setAttribute(
@@ -125,11 +149,10 @@ function App() {
     document.body.removeChild(element);
   };
 
-  const onFrameDrop = (event) => {
-    const { newSession, latestSetlistId } = onDrop(event, session);
-    /* TODO: reset session and navigate to newly imported setlist */
-    // setSession(newSession);
-    // navigate(`/setlist/${latestSetlistId}`);
+  const onFrameDrop = async (event) => {
+    const { newSession, latestSetlistId } = await onDrop(event, session);
+    ogSetSession(newSession);
+    navigate(`/setlist/${latestSetlistId}`);
   };
 
   return (

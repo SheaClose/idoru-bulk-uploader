@@ -507,7 +507,7 @@ const addPlaylistToSession = (session, setlistName) => {
   playlist.name = setlistName;
   session.session.playlists.push(playlist.id);
   session.playlists.push(playlist);
-  return session;
+  return playlist.id;
 };
 
 const generateNewSong = (name) => {
@@ -522,13 +522,13 @@ const addSongToSession = (session, playlistIndex, song) => {
   session.songs.push(song);
 };
 
-const generateNewTrack = (index, fileName = "") => {
+export const generateNewTrack = (index, fileName = "", path) => {
   const track = {
     id: crypto.randomUUID(),
     displayName: `F${index}`,
     songFile: "",
     fileName: fileName,
-    directory: `#{directory}/${fileName}`,
+    directory: `#{directory}/${path}`,
     duration: 0,
     channelName: `Channel ${index}`,
     numberOfChannels: 1,
@@ -541,10 +541,12 @@ const generateNewTrack = (index, fileName = "") => {
 
 export const onDrop = async (event, session) => {
   event.preventDefault();
-
+  let newSession;
   /* Start new Session */
   if (!session) {
-    session = generateNewSession();
+    newSession = generateNewSession();
+  } else {
+    newSession = cloneDeep(session);
   }
 
   if (!supportsFileSystemAccessAPI && !supportsWebkitGetAsEntry) {
@@ -553,30 +555,59 @@ export const onDrop = async (event, session) => {
     );
     return;
   }
+
   const item = event?.dataTransfer?.items?.[0];
   if (!item) return;
   let setlistName;
-  const songs = {};
   const setlist = await (supportsFileSystemAccessAPI
     ? item.getAsFileSystemHandle()
     : item.webkitGetAsEntry());
   if (setlist?.kind !== "directory")
     return alert("Setlist must be a directory!");
   setlistName = setlist.name;
+  let playlistId = addPlaylistToSession(newSession, setlistName);
   for await (const song of setlist.values()) {
     /* skip files (.DS_Store, etc) in song directory */
     if (song?.kind !== "directory") continue;
-    songs[song.name] = [];
-    let i = 1;
+    const newSong = generateNewSong(song.name);
+    const tracks = [];
     for await (const track of song.values()) {
       /* ignore any further directories, focus only on files */
-      if (track?.kind !== "file") continue;
       /* Only accept .wav files */
-      if (!track.name.toLowerCase().includes(".wav")) continue;
-      songs[song.name].push(generateNewTrack(i, track.name));
-      i++;
+      if (
+        track?.kind !== "file" ||
+        !track.name.toLowerCase().includes(".wav")
+      ) {
+        continue;
+      }
+      tracks.push(track.name);
     }
+    /*
+      assign tracks to song input files,
+      assign first 6 inputs to corresponding output.
+    */
+    tracks
+      .sort((a, z) => {
+        return a.toLowerCase().localeCompare(z.toLowerCase());
+      })
+      .forEach((trackName, index) => {
+        const incIndex = index + 1;
+        newSong.inputFiles[`F${incIndex}`] = generateNewTrack(
+          incIndex,
+          trackName,
+          `${setlistName}/${song.name}/${trackName}`
+        );
+        if (incIndex > 6) return;
+        newSong.outputs[`output${incIndex}`][
+          `IN${incIndex}`
+        ].songFileId = `F${incIndex}`;
+        newSong.outputs[`output${incIndex}`][`IN${incIndex}`].active = true;
+      });
+    addSongToSession(
+      newSession,
+      newSession.session.playlists.findIndex((c) => c === playlistId),
+      newSong
+    );
   }
-  console.log({ setlistName, songs });
-  return { newSession: session, latestSetlistId: setlist.id };
+  return { newSession, latestSetlistId: playlistId };
 };

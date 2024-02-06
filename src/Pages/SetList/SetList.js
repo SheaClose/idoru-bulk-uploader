@@ -22,7 +22,7 @@ const PlayList = () => {
 
   return (
     <div className="w-full text-white p-8">
-      <div className="w-full flex gap-8">
+      <div className="w-full flex gap-8 py-2">
         <div className="flex items-center gap-4">
           <Playlist />
           <FormFieldWrapper id="session-name">
@@ -47,12 +47,18 @@ const PlayList = () => {
                 name="src-path"
                 type="text"
                 value={session?.playlists?.[playlistIndex]?.filePath || ""}
-                onChange={(e) => {
+                onBlur={(e) => {
+                  let filePath = e?.target?.value;
+                  /* ensure file path ends in / */
+                  if (!filePath.endsWith("/")) filePath += "/";
+                  setSession(`playlists[${playlistIndex}].filePath`, filePath);
+                }}
+                onChange={(e) =>
                   setSession(
                     `playlists[${playlistIndex}].filePath`,
                     e?.target?.value
-                  );
-                }}
+                  )
+                }
               />
               <span
                 className="absolute inset-t-2 right-2 hover:cursor-pointer"

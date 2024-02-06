@@ -2,11 +2,11 @@ import React from "react";
 import Input from "../../Components/Input";
 import Checkbox from "../../Components/Checkbox";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { HeadPhones, Note } from "../../Components/Icons";
+import { DragHandle, HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
 import { useOutletContext } from "react-router-dom";
 
-const Track = ({ inputId, songFileId, songIndex }) => {
+const Track = ({ inputId, songFileId, songIndex, disabled = false }) => {
   const [session, setSession] = useOutletContext();
   const song = session?.songs[songIndex];
 
@@ -31,7 +31,8 @@ const Track = ({ inputId, songFileId, songIndex }) => {
     ]);
   };
 
-  const trackDisbaled = !song?.inputFiles?.[songFileId]?.fileName?.length;
+  const trackDisbaled =
+    disabled || !song?.inputFiles?.[songFileId]?.fileName?.length;
 
   const checkBoxConfig = [
     {
@@ -136,6 +137,10 @@ const Track = ({ inputId, songFileId, songIndex }) => {
               );
             }
           )}
+        </div>
+        {/*...draggableProvided.dragHandleProps*/}
+        <div className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]">
+          <DragHandle />
         </div>
       </div>
     </div>

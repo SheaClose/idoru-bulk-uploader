@@ -30,7 +30,6 @@ const Songs = () => {
                   <div
                     ref={draggableProvided.innerRef}
                     {...draggableProvided.draggableProps}
-                    {...draggableProvided.dragHandleProps}
                   >
                     <Accordian
                       key={id}
@@ -102,10 +101,11 @@ const Songs = () => {
                       }
                     >
                       {Object.entries(song.inputFiles)
-                        .slice(0, 6)
+                        // .slice(0, 6)
                         .map(([songFileId, inputFile], index) => {
                           return (
                             <Track
+                              disabled={index > 5}
                               inputId={`IN${index + 1}`}
                               key={inputFile.id}
                               songFileId={songFileId}
