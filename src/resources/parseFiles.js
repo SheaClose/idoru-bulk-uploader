@@ -28,7 +28,7 @@ const songTemplate = {
   name: "",
   level: 0,
   bpm: 120,
-  endOfSong: "QueueNext",
+  endOfSong: "PlayNext",
   midiFile: {
     id: "8aca8d93-a13d-4dd3-81da-ea51d695c984",
     fileName: null,

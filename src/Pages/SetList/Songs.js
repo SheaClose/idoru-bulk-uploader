@@ -10,10 +10,16 @@ import { useOutletContext } from "react-router-dom";
 import { DragDropContext } from "react-beautiful-dnd";
 import { cloneDeep } from "lodash";
 import Button from "../../Components/Button";
-
+import { toast } from "react-hot-toast";
 const Songs = () => {
   let { playListId } = useParams();
-  const { session, setSession, songsById } = useOutletContext();
+  const {
+    session,
+    setSession,
+    songsById,
+    byPassConfirmation,
+    setByPassConfirmation,
+  } = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
@@ -43,6 +49,17 @@ const Songs = () => {
       song.inputFiles[`F${incIndex}`] = track;
     });
     setSession(`songs[${songIndex}]`, song);
+  };
+
+  const handleSongDelete = (songId) => {
+    const songs = session?.songs?.filter(({ id }) => id !== songId);
+    const playListSongs = session?.playlists?.[playlistIndex]?.songs.filter(
+      (id) => id !== songId
+    );
+    setSession([
+      [`songs`, songs],
+      [`playlists.[${playlistIndex}].songs`, playListSongs],
+    ]);
   };
   return (
     <Droppable droppableId={playListId}>
@@ -118,9 +135,53 @@ const Songs = () => {
                           </FormFieldWrapper>
                           <Button
                             theme="actionButton"
+                            title="Delete Song"
                             label={<Close />}
                             onClick={() => {
-                              console.log("remove song");
+                              if (byPassConfirmation)
+                                return handleSongDelete(song.id);
+                              toast.custom(
+                                <div className="bg-[--btn] text-white p-4">
+                                  <div className="flex gap-4 items-center">
+                                    <div className="flex flex-col items-start gap-4">
+                                      <div>You really wanna do that?</div>
+                                      <div className="flex gap-2 text-xs">
+                                        <input
+                                          value={byPassConfirmation}
+                                          type="checkbox"
+                                          name=""
+                                          id=""
+                                          onChange={({ target }) =>
+                                            setByPassConfirmation(
+                                              target?.checked
+                                            )
+                                          }
+                                        />
+                                        (Don't remind me again)
+                                      </div>
+                                    </div>
+                                    <span className="border-[1px] border-[--white] rounded-md">
+                                      <Button
+                                        theme="secondary"
+                                        label={"Nope"}
+                                        onClick={() => toast.remove()}
+                                      />
+                                    </span>
+                                    <Button
+                                      label={"Yep"}
+                                      autoFocus={true}
+                                      onClick={() => {
+                                        handleSongDelete(song.id);
+                                        toast.remove();
+                                      }}
+                                    />
+                                  </div>
+                                </div>,
+                                {
+                                  position: "top-center",
+                                  duration: 20000,
+                                }
+                              );
                             }}
                           />
                           <span

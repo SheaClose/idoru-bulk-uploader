@@ -19,7 +19,7 @@ function App() {
     JSON.parse(localStorage.getItem("iP1Session"))
   );
   const [loading, setLoading] = useState(false);
-
+  const [byPassConfirmation, setByPassConfirmation] = useState(false);
   useEffect(() => {
     localStorage.setItem("iP1Session", JSON.stringify(session));
   }, [session]);
@@ -161,6 +161,7 @@ function App() {
     );
     const { newSession, latestSetlistId } =
       (await onDrop(event, session)) || {};
+    toast.remove();
     setLoading(false);
     if (!newSession) {
       return;
@@ -242,6 +243,8 @@ function App() {
               session,
               setSession,
               songsById,
+              byPassConfirmation,
+              setByPassConfirmation,
             }}
           />
         </FileDrop>

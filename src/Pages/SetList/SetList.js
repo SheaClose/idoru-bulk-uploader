@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../Components/Input";
+import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { Playlist, Help, Folder } from "../../Components/Icons";
+import { Playlist, Help, Folder, Close } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
@@ -10,7 +11,8 @@ import toast from "react-hot-toast";
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
-  const { session, setSession } = useOutletContext();
+  const { session, setSession, byPassConfirmation, setByPassConfirmation } =
+    useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
@@ -20,6 +22,19 @@ const PlayList = () => {
       navigate("/");
     }
   }, [playlist, navigate]);
+
+  const handleSetlistDelete = () => {
+    const playlists = session?.playlists?.filter(({ id }) => id !== playListId);
+    const sessionPlaylists = session?.session?.playlists?.filter(
+      (id) => id !== playListId
+    );
+    setSession([
+      [`playlists`, playlists],
+      [`session.playlists`, sessionPlaylists],
+    ]);
+    const newPlaylistId = session?.session?.playlists[0];
+    navigate(newPlaylistId ? `/setlist/${newPlaylistId}` : "/");
+  };
 
   return (
     <div className="w-full text-white p-8">
@@ -97,6 +112,57 @@ const PlayList = () => {
             </FormFieldWrapper>
           </div>
         ) : null}
+        <Button
+          theme="actionButton"
+          style={{ marginLeft: "-1rem" }}
+          title="Delete Setlist"
+          autoFocus={true}
+          label={<Close />}
+          onClick={() => {
+            if (byPassConfirmation) {
+              return handleSetlistDelete();
+            }
+            toast.custom(
+              <div className="bg-[--btn] text-white p-4">
+                <div className="flex gap-4 items-center">
+                  <div className="flex flex-col items-start gap-4">
+                    <div>You really wanna do that?</div>
+                    <div className="flex gap-2 text-xs">
+                      <input
+                        value={byPassConfirmation}
+                        type="checkbox"
+                        name=""
+                        id=""
+                        onChange={({ target }) =>
+                          setByPassConfirmation(target?.checked)
+                        }
+                      />
+                      (Don't remind me again)
+                    </div>
+                  </div>
+                  <span className="border-[1px] border-[--white] rounded-md">
+                    <Button
+                      theme="secondary"
+                      label={"Nope"}
+                      onClick={() => toast.remove()}
+                    />
+                  </span>
+                  <Button
+                    label={"Yep"}
+                    onClick={() => {
+                      handleSetlistDelete();
+                      toast.remove();
+                    }}
+                  />
+                </div>
+              </div>,
+              {
+                position: "top-center",
+                duration: 20000,
+              }
+            );
+          }}
+        />
       </div>
       <Songs />
     </div>
