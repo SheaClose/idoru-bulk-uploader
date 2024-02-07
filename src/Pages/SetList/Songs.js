@@ -83,7 +83,7 @@ const Songs = () => {
                             <select
                               id="end-of-song"
                               name="play-next"
-                              className="p-4 bg-[--btn] w-96 rounded-md"
+                              className="py-4 pl-[4px] pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] rounded-md"
                               value={song.endOfSong}
                               onChange={(e) => {
                                 setSession(

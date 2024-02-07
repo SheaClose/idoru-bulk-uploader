@@ -184,7 +184,7 @@ function App() {
             <select
               id="end-of-song"
               name="play-next"
-              className="p-4 bg-[--btn] w-32 rounded-md text-white"
+              className="py-4 pl-1 pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] w-32 rounded-md text-white"
               value={playListId || ""}
               onChange={(e) => {
                 navigate(`/setlist/${e.target.value}`);
