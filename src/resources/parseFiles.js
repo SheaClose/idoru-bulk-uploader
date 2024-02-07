@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-
+import toast from "react-hot-toast";
 const supportsFileSystemAccessAPI =
   "getAsFileSystemHandle" in DataTransferItem.prototype;
 const supportsWebkitGetAsEntry =
@@ -523,18 +523,18 @@ const addSongToSession = (session, playlistIndex, song) => {
   session.songs.push(song);
 };
 
-export const generateNewTrack = (index, fileName = "", path) => {
+export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
   const track = {
     id: crypto.randomUUID(),
     displayName: `F${index}`,
     songFile: "",
     fileName: fileName,
     directory: `#{directory}/${path}`,
-    duration: 0,
+    duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
-    numberOfChannels: 1,
+    numberOfChannels: trackConfig?.numberOfChannels || 1,
     bitsPerSample: 16,
-    sampleRate: 44100,
+    sampleRate: trackConfig?.sampleRate || 44100,
     missingFile: false,
   };
   return track;
@@ -551,7 +551,7 @@ export const onDrop = async (event, session) => {
   }
 
   if (!supportsFileSystemAccessAPI && !supportsWebkitGetAsEntry) {
-    alert(
+    toast(
       "System doesn't support directory upload. Please import *.idoru file to use this application."
     );
     return;
@@ -563,8 +563,10 @@ export const onDrop = async (event, session) => {
   const setlist = await (supportsFileSystemAccessAPI
     ? item.getAsFileSystemHandle()
     : item.webkitGetAsEntry());
-  if (setlist?.kind !== "directory")
-    return alert("Setlist must be a directory!");
+  if (setlist?.kind !== "directory") {
+    toast.remove();
+    return toast("Setlist must be a directory!", { duration: 2000 });
+  }
   setlistName = setlist.name;
   let playlistId = addPlaylistToSession(newSession, setlistName);
   for await (const song of setlist.values()) {
@@ -581,22 +583,45 @@ export const onDrop = async (event, session) => {
       ) {
         continue;
       }
-      tracks.push(track.name);
+      const trackFile = await track.getFile();
+      tracks.push(
+        new Promise((res, rej) => {
+          const audioContext = new AudioContext();
+          const reader = new FileReader();
+          function decodedDone(decoded) {
+            new Float32Array(decoded.length);
+            decoded.getChannelData(0);
+          }
+          reader.onload = async function () {
+            const arrayBuffer = reader.result;
+            res({
+              name: track.name,
+              data: await audioContext.decodeAudioData(
+                arrayBuffer,
+                decodedDone
+              ),
+            });
+          };
+          reader.readAsArrayBuffer(trackFile);
+        })
+      );
     }
+    const tracksData = await Promise.all(tracks);
     /*
       assign tracks to song input files,
       assign first 6 inputs to corresponding output.
     */
-    tracks
+    tracksData
       .sort((a, z) => {
-        return a.toLowerCase().localeCompare(z.toLowerCase());
+        return a.name.toLowerCase().localeCompare(z.name.toLowerCase());
       })
-      .forEach((trackName, index) => {
+      .forEach(({ name, data }, index) => {
         const incIndex = index + 1;
         newSong.inputFiles[`F${incIndex}`] = generateNewTrack(
           incIndex,
-          trackName,
-          `${setlistName}/${song.name}/${trackName}`
+          name,
+          `${setlistName}/${song.name}/${name}`,
+          data
         );
         if (incIndex > 6) return;
         newSong.outputs[`output${incIndex}`][

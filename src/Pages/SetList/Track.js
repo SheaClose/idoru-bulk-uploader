@@ -38,7 +38,7 @@ const Track = ({
   };
   const hasNoTrack = !song?.inputFiles?.[songFileId]?.fileName?.length;
   const trackDisbaled = disabled || hasNoTrack;
-
+  const trackId = song?.inputFiles?.[songFileId].id;
   const checkBoxConfig = [
     {
       containerClass: "flex flex-col gap-1 justify-between mr-2 pr-3",
@@ -77,7 +77,7 @@ const Track = ({
   return (
     <div className="pl-20 mt-4">
       <Draggable
-        key={inputId}
+        key={`${inputId}-${trackId}-${songIndex}`}
         draggableId={inputId}
         index={trackIndex}
         isDragDisabled={hasNoTrack}
@@ -138,7 +138,7 @@ const Track = ({
                   ) => {
                     return (
                       <div
-                        key={`${inputId}-${index}`}
+                        key={`${inputId}-${index}-${checkBoxName}`}
                         className={containerClass}
                         style={containerStyle || {}}
                       >

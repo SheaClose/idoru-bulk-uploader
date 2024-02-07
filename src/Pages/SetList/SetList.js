@@ -5,13 +5,12 @@ import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import { Playlist, Help, Folder } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
-import classNames from "classnames";
+import toast from "react-hot-toast";
 
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
-  const { session, setSession, setListsNeedingDirectoryPath } =
-    useOutletContext();
+  const { session, setSession } = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
@@ -42,13 +41,7 @@ const PlayList = () => {
         <div className="flex items-center gap-4">
           <Folder />
           <FormFieldWrapper id="src-path">
-            <div
-              className={classNames("flex items-center relative", {
-                "ring-1 ring-[--pink]":
-                  setListsNeedingDirectoryPath.includes(playListId) &&
-                  !session?.playlists?.[playlistIndex]?.filePath,
-              })}
-            >
+            <div className="flex items-center relative">
               <Input
                 placeholder="Path to Directory"
                 id="src-path"
@@ -72,8 +65,9 @@ const PlayList = () => {
               <span
                 className="absolute inset-t-2 right-2 hover:cursor-pointer"
                 onClick={() =>
-                  alert(
-                    `Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. \n\nSee the FAQ for more information.`
+                  toast(
+                    `Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. \n\nSee the FAQ for more information.`,
+                    { duration: 10000 }
                   )
                 }
               >

@@ -60,12 +60,8 @@ const Songs = () => {
                     {...draggableProvided.draggableProps}
                   >
                     <Accordian
-                      key={id}
                       header={
-                        <div
-                          className="w-full flex items-center gap-4 pl-10 py-2 relative"
-                          key={id}
-                        >
+                        <div className="w-full flex items-center gap-4 pl-10 py-2 relative">
                           <span className="absolute inset-x-2 inset-y-4 w-1">
                             {playlistSongIndex + 1}.
                           </span>
@@ -143,7 +139,7 @@ const Songs = () => {
                                       disabled={index > 5}
                                       trackIndex={index}
                                       inputId={`IN${index + 1}`}
-                                      key={inputFile.id}
+                                      key={`${song.id}-${songFileId}-${inputFile}-${inputFile.id}`}
                                       songFileId={songFileId}
                                       inputFile={inputFile}
                                       songIndex={songIndex}

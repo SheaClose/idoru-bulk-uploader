@@ -6,10 +6,11 @@ import FileImport from "./Components/FileImport";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
-import { flatten, set } from "lodash";
-/* import Modal from "./Components/Modal"; */
+import { set } from "lodash";
 import { FileDrop } from "react-file-drop";
-import { onDrop /* , generateNewTrack */ } from "./resources/parseFiles";
+import { onDrop } from "./resources/parseFiles";
+import Spinner from "./Components/Spinner";
+import toast, { Toaster } from "react-hot-toast";
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -17,30 +18,7 @@ function App() {
   const [session, ogSetSession] = useState(
     JSON.parse(localStorage.getItem("iP1Session"))
   );
-
-  const setListsNeedingDirectoryPath = useMemo(() => {
-    // if any of the tracks still have a placeholder `directory`,
-    // that set list needs to be updated with a "path to directory"
-    return session.playlists
-      .filter((pL) => {
-        const plSongs = session.songs.filter((song) =>
-          pL.songs.includes(song.id)
-        );
-
-        return flatten(
-          plSongs.map(({ inputFiles }) => Object.values(inputFiles))
-        )
-          ?.map(({ directory }) => directory)
-          ?.some((str) => str.includes("#{directory}"));
-      })
-      ?.map(({ id }) => id);
-  }, [session]);
-
-  const stillNeedingAction = useMemo(() => {
-    return !!setListsNeedingDirectoryPath.filter(
-      (plId) => session.playlists.find(({ id }) => plId).filePath
-    ).length;
-  }, [setListsNeedingDirectoryPath, session.playlists]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("iP1Session", JSON.stringify(session));
@@ -89,10 +67,12 @@ function App() {
 
   const handleImport = (e) => {
     if (!e?.target?.files?.length) return;
+    setLoading(true);
     const fileReader = new FileReader();
     fileReader.onload = function (e) {
       const text = e.target.result;
       setSession("", JSON.parse(text));
+      setLoading(false);
       navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
     };
     fileReader.readAsText(e?.target?.files[0]);
@@ -128,47 +108,56 @@ function App() {
         session?.playlists?.[playlistIndex]?.filePath
       Unless an *.idoru file was used for import.
     */
+    // console.log(flatten(session.playlists.map(({ songs }) => songs)));
     // session.songs.forEach((song) => {
-    // console.log("song.inputFiles: ", song.inputFiles);
-    // const newF7 = generateNewTrack(7);
-    // newF7.directory = "";
-    // song.inputFiles = Object.entries(song.inputFiles)
-    // .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
-    // .slice(0, 6)
-    // .reduce(
-    // (acc, [key, val]) => {
-    // if (!isIdoruImport) {
-    // /* generate file paths for input files */
-    // val.directory = val.directory.replace(
-    // "#{directory}",
-    // session?.playlists?.[playlistIndex]?.filePath
-    // );
-    // }
-    // return { ...acc, [key]: val };
-    // },
-    // {
-    // F7: newF7,
-    // }
-    // );
-    // console.log("new song.inputFiles: ", song.inputFiles);
+    //   const newF7 = generateNewTrack(7);
+    //   newF7.directory = "";
+    //   song.inputFiles = Object.entries(song.inputFiles)
+    //     .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
+    //     .slice(0, 6)
+    //     .reduce(
+    //       (acc, [key, val]) => {
+    //         /* generate file paths for input files that used a placeholder */
+    //         val.directory = val.directory.replace(
+    //           "#{directory}",
+    //           session?.playlists?.[playlistIndex]?.filePath
+    //         );
+    //         return { ...acc, [key]: val };
+    //       },
+    //       {
+    //         F7: newF7,
+    //       }
+    //     );
     // });
     /* END cleanup */
-    const fileName = `${session?.session?.name}.idoru`;
-    var element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:application/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(session))
-    );
-    element.setAttribute("download", fileName);
-    element.style.display = "none";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    // const fileName = `${session?.session?.name}.idoru`;
+    // var element = document.createElement("a");
+    // element.setAttribute(
+    //   "href",
+    //   "data:application/json;charset=utf-8," +
+    //     encodeURIComponent(JSON.stringify(session))
+    // );
+    // element.setAttribute("download", fileName);
+    // element.style.display = "none";
+    // document.body.appendChild(element);
+    // element.click();
+    // document.body.removeChild(element);
   };
 
   const onFrameDrop = async (event) => {
-    const { newSession, latestSetlistId } = await onDrop(event, session);
+    setLoading(true);
+    toast(
+      `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
+          
+          Like, seriously, if the spinner's running, we're processing, go get a tea or something.`,
+      { duration: 7000 }
+    );
+    const { newSession, latestSetlistId } =
+      (await onDrop(event, session)) || {};
+    setLoading(false);
+    if (!newSession) {
+      return;
+    }
     ogSetSession(newSession);
     navigate(`/setlist/${latestSetlistId}`);
   };
@@ -176,6 +165,8 @@ function App() {
   return (
     <div className="app">
       {/* <Modal /> */}
+      {loading ? <Spinner /> : null}
+      <Toaster toastOptions={{ duration: 5000 }} />
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
         <div className="flex gap-4 items-center font-bold text-2xl">
           <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
@@ -198,9 +189,6 @@ function App() {
               {session?.playlists?.map((playlist) => (
                 <option key={playlist?.id} value={playlist?.id}>
                   {playlist?.name}{" "}
-                  {setListsNeedingDirectoryPath.includes(playlist.id)
-                    ? "*"
-                    : ""}
                 </option>
               ))}
             </select>
@@ -226,12 +214,7 @@ function App() {
               }}
             />
           ) : null}
-          <Button
-            disabled={stillNeedingAction}
-            label="Export"
-            theme={"secondary"}
-            onClick={handleExport}
-          />
+          <Button label="Export" theme={"secondary"} onClick={handleExport} />
           <FileImport
             onFileUpload={handleImport}
             label="Import"
@@ -252,7 +235,6 @@ function App() {
               session,
               setSession,
               songsById,
-              setListsNeedingDirectoryPath,
             }}
           />
         </FileDrop>
