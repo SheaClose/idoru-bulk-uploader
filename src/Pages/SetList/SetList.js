@@ -23,6 +23,22 @@ const PlayList = () => {
 
   return (
     <div className="w-full text-white p-8">
+      {session?.playlists?.length ? (
+        <div className="pb-8 mt-[-1rem] w-full flex justify-end">
+          <FormFieldWrapper id="session-name">
+            <Input
+              placeholder="Session Name"
+              id="session-name"
+              name="session-name"
+              type="text"
+              value={session?.session?.name}
+              onChange={(e) => {
+                setSession(`session.name`, e.target.value);
+              }}
+            />
+          </FormFieldWrapper>
+        </div>
+      ) : null}
       <div className="w-full flex gap-8 py-2">
         <div className="flex items-center gap-4">
           <Playlist />

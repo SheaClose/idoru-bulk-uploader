@@ -6,7 +6,7 @@ import FileImport from "./Components/FileImport";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
-import { set, flatten } from "lodash";
+import { set } from "lodash";
 import { FileDrop } from "react-file-drop";
 import { onDrop, generateNewTrack } from "./resources/parseFiles";
 import Spinner from "./Components/Spinner";
@@ -113,8 +113,8 @@ function App() {
       if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
         canUpload = false;
         return toast(
-          "Setlists that were created within this tool MUST have a file path to the directory. Check each setlist and verify " +
-            ' "Path to Directory:" is filled out. See FAQ for more info.'
+          `Setlists that were created within this tool MUST have a file path to the directory. \n\nCheck Setlist named: "${playlist.name}" and verify "Path to Directory:" is filled out. \n\nSee FAQ for more info.`,
+          { duration: 7500 }
         );
       }
       playlist.songs.forEach((songId) => {
@@ -124,29 +124,25 @@ function App() {
         song.inputFiles = Object.entries(song.inputFiles)
           .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
           .slice(0, 6)
-          .reduce(
-            (acc, [key, val]) => {
-              val.directory = val.directory.replace(
-                "#{directory}",
-                session?.playlists?.[playlistIndex]?.filePath
-              );
-              return { ...acc, [key]: val };
-            },
-            {
-              F7: newF7,
-            }
-          );
+          .reduce((acc, [key, val]) => {
+            val.directory = val.directory.replace(
+              "#{directory}",
+              session?.playlists?.[playlistIndex]?.filePath
+            );
+            return { ...acc, [key]: val };
+          }, {});
+        song.inputFiles["F7"] = newF7;
       });
     });
     /* END cleanup */
-
+    if (!canUpload) return;
     /* Verify Values?  */
     const fileName = `${session?.session?.name || "Untitled Session"}.idoru`;
-    console.log("fileName: ", fileName);
     var element = document.createElement("a");
     element.setAttribute(
       "href",
-      "data:application/json;charset=utf-8," + encodeURIComponent(session)
+      "data:application/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(session))
     );
     element.setAttribute("download", fileName);
     element.style.display = "none";
