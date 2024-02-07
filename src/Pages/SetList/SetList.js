@@ -38,44 +38,49 @@ const PlayList = () => {
             />
           </FormFieldWrapper>
         </div>
-        <div className="flex items-center gap-4">
-          <Folder />
-          <FormFieldWrapper id="src-path">
-            <div className="flex items-center relative">
-              <Input
-                placeholder="Path to Directory"
-                id="src-path"
-                name="src-path"
-                type="text"
-                value={session?.playlists?.[playlistIndex]?.filePath || ""}
-                onBlur={(e) => {
-                  let filePath = e?.target?.value;
-                  if (!filePath) return;
-                  /* ensure file path ends in / */
-                  if (!filePath.endsWith("/")) filePath += "/";
-                  setSession(`playlists[${playlistIndex}].filePath`, filePath);
-                }}
-                onChange={(e) =>
-                  setSession(
-                    `playlists[${playlistIndex}].filePath`,
-                    e?.target?.value
-                  )
-                }
-              />
-              <span
-                className="absolute inset-t-2 right-2 hover:cursor-pointer"
-                onClick={() =>
-                  toast(
-                    `Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. \n\nSee the FAQ for more information.`,
-                    { duration: 10000 }
-                  )
-                }
-              >
-                <Help height={14} width={14} />
-              </span>
-            </div>
-          </FormFieldWrapper>
-        </div>
+        {playlist.hasOwnProperty("filePath") ? (
+          <div className="flex items-center gap-4">
+            <Folder />
+            <FormFieldWrapper id="src-path">
+              <div className="flex items-center relative">
+                <Input
+                  placeholder="Path to Directory"
+                  id="src-path"
+                  name="src-path"
+                  type="text"
+                  value={session?.playlists?.[playlistIndex]?.filePath || ""}
+                  onBlur={(e) => {
+                    let filePath = e?.target?.value;
+                    if (!filePath) return;
+                    /* ensure file path ends in / */
+                    if (!filePath.endsWith("/")) filePath += "/";
+                    setSession(
+                      `playlists[${playlistIndex}].filePath`,
+                      filePath
+                    );
+                  }}
+                  onChange={(e) =>
+                    setSession(
+                      `playlists[${playlistIndex}].filePath`,
+                      e?.target?.value
+                    )
+                  }
+                />
+                <span
+                  className="absolute inset-t-2 right-2 hover:cursor-pointer"
+                  onClick={() =>
+                    toast(
+                      `Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. \n\nSee the FAQ for more information.`,
+                      { duration: 10000 }
+                    )
+                  }
+                >
+                  <Help height={14} width={14} />
+                </span>
+              </div>
+            </FormFieldWrapper>
+          </div>
+        ) : null}
       </div>
       <Songs />
     </div>

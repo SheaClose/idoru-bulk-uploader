@@ -6,6 +6,7 @@ const supportsWebkitGetAsEntry =
   "webkitGetAsEntry" in DataTransferItem.prototype;
 
 const playlistTemplate = {
+  filePath: "",
   id: "",
   name: "",
   isOpen: true,
@@ -529,7 +530,7 @@ export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
     displayName: `F${index}`,
     songFile: "",
     fileName: fileName,
-    directory: `#{directory}/${path}`,
+    directory: `#{directory}${path}`,
     duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
     numberOfChannels: trackConfig?.numberOfChannels || 1,

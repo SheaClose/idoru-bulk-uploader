@@ -6,9 +6,9 @@ import FileImport from "./Components/FileImport";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
-import { set } from "lodash";
+import { set, flatten } from "lodash";
 import { FileDrop } from "react-file-drop";
-import { onDrop } from "./resources/parseFiles";
+import { onDrop, generateNewTrack } from "./resources/parseFiles";
 import Spinner from "./Components/Spinner";
 import toast, { Toaster } from "react-hot-toast";
 function App() {
@@ -108,40 +108,51 @@ function App() {
         session?.playlists?.[playlistIndex]?.filePath
       Unless an *.idoru file was used for import.
     */
-    // console.log(flatten(session.playlists.map(({ songs }) => songs)));
-    // session.songs.forEach((song) => {
-    //   const newF7 = generateNewTrack(7);
-    //   newF7.directory = "";
-    //   song.inputFiles = Object.entries(song.inputFiles)
-    //     .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
-    //     .slice(0, 6)
-    //     .reduce(
-    //       (acc, [key, val]) => {
-    //         /* generate file paths for input files that used a placeholder */
-    //         val.directory = val.directory.replace(
-    //           "#{directory}",
-    //           session?.playlists?.[playlistIndex]?.filePath
-    //         );
-    //         return { ...acc, [key]: val };
-    //       },
-    //       {
-    //         F7: newF7,
-    //       }
-    //     );
-    // });
+    let canUpload = true;
+    session.playlists.forEach((playlist, playlistIndex) => {
+      if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
+        canUpload = false;
+        return toast(
+          "Setlists that were created within this tool MUST have a file path to the directory. Check each setlist and verify " +
+            ' "Path to Directory:" is filled out. See FAQ for more info.'
+        );
+      }
+      playlist.songs.forEach((songId) => {
+        const song = songsById[songId];
+        const newF7 = generateNewTrack(7);
+        newF7.directory = "";
+        song.inputFiles = Object.entries(song.inputFiles)
+          .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
+          .slice(0, 6)
+          .reduce(
+            (acc, [key, val]) => {
+              val.directory = val.directory.replace(
+                "#{directory}",
+                session?.playlists?.[playlistIndex]?.filePath
+              );
+              return { ...acc, [key]: val };
+            },
+            {
+              F7: newF7,
+            }
+          );
+      });
+    });
     /* END cleanup */
-    // const fileName = `${session?.session?.name}.idoru`;
-    // var element = document.createElement("a");
-    // element.setAttribute(
-    //   "href",
-    //   "data:application/json;charset=utf-8," +
-    //     encodeURIComponent(JSON.stringify(session))
-    // );
-    // element.setAttribute("download", fileName);
-    // element.style.display = "none";
-    // document.body.appendChild(element);
-    // element.click();
-    // document.body.removeChild(element);
+
+    /* Verify Values?  */
+    const fileName = `${session?.session?.name || "Untitled Session"}.idoru`;
+    console.log("fileName: ", fileName);
+    var element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:application/json;charset=utf-8," + encodeURIComponent(session)
+    );
+    element.setAttribute("download", fileName);
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   const onFrameDrop = async (event) => {
