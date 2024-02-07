@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { DragHandle } from "../../Components/Icons";
+import { DragHandle, Close } from "../../Components/Icons";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import Accordian from "../../Components/Accordian";
@@ -9,6 +9,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import { useOutletContext } from "react-router-dom";
 import { DragDropContext } from "react-beautiful-dnd";
 import { cloneDeep } from "lodash";
+import Button from "../../Components/Button";
 
 const Songs = () => {
   let { playListId } = useParams();
@@ -115,12 +116,22 @@ const Songs = () => {
                               }}
                             />
                           </FormFieldWrapper>
-                          <div
+                          <Button
+                            theme="actionButton"
+                            label={<Close />}
+                            onClick={() => {
+                              console.log("remove song");
+                            }}
+                          />
+                          <span
                             {...draggableProvided.dragHandleProps}
-                            className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]"
+                            className="hover:!cursor-grab"
                           >
-                            <DragHandle />
-                          </div>
+                            <Button
+                              theme="actionButton"
+                              label={<DragHandle />}
+                            />
+                          </span>
                         </div>
                       }
                     >

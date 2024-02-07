@@ -1,8 +1,9 @@
 import React from "react";
 import Input from "../../Components/Input";
 import Checkbox from "../../Components/Checkbox";
+import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { DragHandle, HeadPhones, Note } from "../../Components/Icons";
+import { Close, DragHandle, HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
 import { useOutletContext } from "react-router-dom";
 import { Draggable } from "react-beautiful-dnd";
@@ -156,15 +157,27 @@ const Track = ({
                   }
                 )}
               </div>
-
+              <Button
+                theme="actionButton"
+                label={<Close />}
+                onClick={() => {
+                  console.log("remove track");
+                }}
+              />
               {!hasNoTrack ? (
-                <div
+                <span
                   {...draggableProvided.dragHandleProps}
-                  className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]"
+                  className="hover:!cursor-grab"
                 >
-                  <DragHandle />
-                </div>
+                  <Button theme="actionButton" label={<DragHandle />} />
+                </span>
               ) : null}
+              {/* <div
+                {...draggableProvided.dragHandleProps}
+                className="border border-[--btn-darker] p-1 rounded-md hover:bg-[--btn-hover] bg-[--btn]"
+              >
+                <DragHandle />
+              </div> */}
             </div>
           </div>
         )}
