@@ -29,10 +29,10 @@ const About = () => {
         </p>
         {truncateIs ? (
           <span
-            className="-mt-6 cursor-pointer text-[#08F]"
+            className="-mt-6 cursor-pointer text-[--btn-text] text-sm"
             onClick={() => setTruncateIs(false)}
           >
-            ( ... )
+            [show more]
           </span>
         ) : (
           <>
@@ -56,10 +56,10 @@ const About = () => {
               setlists.
             </p>
             <span
-              className="-mt-6 cursor-pointer text-[#08F]"
+              className="-mt-6 cursor-pointer text-[--btn-text] text-sm"
               onClick={() => setTruncateIs(true)}
             >
-              ( ... )
+              [show less]
             </span>
           </>
         )}
@@ -82,10 +82,10 @@ const About = () => {
         </p>
         {truncateIsNot ? (
           <span
-            className="-mt-6 cursor-pointer text-[#08F]"
+            className="-mt-6 cursor-pointer text-[--btn-text] text-sm"
             onClick={() => setTruncateIsNot(false)}
           >
-            ( ... )
+            [show more]
           </span>
         ) : (
           <>
@@ -110,10 +110,10 @@ const About = () => {
               you as it is for me.
             </p>
             <span
-              className="-mt-6 cursor-pointer text-[#08F]"
+              className="-mt-6 cursor-pointer text-[--btn-text] text-sm"
               onClick={() => setTruncateIsNot(true)}
             >
-              ( ... )
+              [show less]
             </span>
           </>
         )}

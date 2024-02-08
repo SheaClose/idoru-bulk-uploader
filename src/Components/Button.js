@@ -9,7 +9,7 @@ const Button = ({
 }) => {
   const themeHash = {
     default: "bg-pink hover:bg-pink-100",
-    secondary: "bg-btn disabled:bg-btn hover:bg-btnHover",
+    secondary: "bg-btn disabled:bg-btn hover:bg-btnHover text-white",
     actionButton:
       "bg-btn disabled:bg-btn hover:bg-btnHover !w-12 flex justify-center items-center !p-0 aspect-square",
   };

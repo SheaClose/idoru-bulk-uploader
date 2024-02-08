@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import "./App.css";
 import idoruLogo from "./resources/Idoru-Logo-word_Dark.png";
 import Slide from "./Components/Slide";
+import Modal from "./Components/Modal";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
@@ -11,6 +12,7 @@ import { onDrop, generateNewTrack } from "./resources/parseFiles";
 import Spinner from "./Components/Spinner";
 import toast, { Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
+
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -19,6 +21,8 @@ function App() {
     JSON.parse(localStorage.getItem("iP1Session"))
   );
   const [loading, setLoading] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  /* const [droppedFiles, setDroppedFiles] = useState(null); */
   const [byPassConfirmation, setByPassConfirmation] = useState(false);
   useEffect(() => {
     localStorage.setItem("iP1Session", JSON.stringify(session));
@@ -151,7 +155,8 @@ function App() {
     document.body.removeChild(element);
   };
 
-  const onFrameDrop = async (event) => {
+  const handleDroppedFilesImport = async (event) => {
+    // const event = droppedFiles;
     setLoading(true);
     toast(
       `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
@@ -169,6 +174,11 @@ function App() {
     ogSetSession(newSession);
     navigate(`/setlist/${latestSetlistId}`);
   };
+
+  /* const onFrameDrop = async (event) => {
+    setDroppedFiles(event);
+    return setModalIsOpen(true);
+  }; */
 
   const onNavItemSelect = (navItem, ...args) => {
     switch (navItem) {
@@ -206,7 +216,26 @@ function App() {
   };
   return (
     <div className="app">
-      {/* <Modal /> */}
+      <Modal
+        isOpen={modalIsOpen}
+        onConfirm={(method) => {
+          if (method === "accurate") {
+            setByPassConfirmation(false);
+          } else {
+            setByPassConfirmation(true);
+          }
+          handleDroppedFilesImport();
+          setModalIsOpen(false);
+        }}
+        onCancel={() => setModalIsOpen(false)}
+        header="How do you want to upload?"
+      >
+        <div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi ratione
+          itaque animi deleniti magnam odio, ab dignissimos autem! Ipsum error
+          labore vero eligendi voluptatibus atque magnam quia et officiis culpa.{" "}
+        </div>
+      </Modal>
       {loading ? <Spinner /> : null}
       <Toaster toastOptions={{ duration: 5000 }} />
 
@@ -218,7 +247,7 @@ function App() {
         <Slide onNavItemSelect={onNavItemSelect} />
       </nav>
       <DragDropContext onDragEnd={onDragEnd}>
-        <FileDrop onFrameDrop={onFrameDrop}>
+        <FileDrop onFrameDrop={handleDroppedFilesImport /* onFrameDrop */}>
           {/* 
             Todo: Style body based on drag event.
             onDragOver: function(event): Callback when the user is dragging over the target. Also adds the file-drop-dragging-over-target class to the file-drop-target.

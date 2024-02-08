@@ -542,6 +542,9 @@ export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
 };
 
 export const onDrop = async (event, session) => {
+  const byPassTrackMetaValidation = Boolean(
+    localStorage.getItem("byPassTrackMetaValidation")
+  );
   event.preventDefault();
   let newSession;
   /* Start new Session */
@@ -576,36 +579,49 @@ export const onDrop = async (event, session) => {
     const newSong = generateNewSong(song.name);
     const tracks = [];
     for await (const track of song.values()) {
+      const trackIsAudio = track.name.toLowerCase().includes(".wav");
+      const trackIsMidi = track.name.toLowerCase().includes(".mid");
       /* ignore any further directories, focus only on files */
       /* Only accept .wav files */
-      if (
-        track?.kind !== "file" ||
-        !track.name.toLowerCase().includes(".wav")
-      ) {
+      if (track?.kind !== "file" || !(trackIsAudio || trackIsMidi)) {
         continue;
       }
-      const trackFile = await track.getFile();
-      tracks.push(
-        new Promise((res, rej) => {
-          const audioContext = new AudioContext();
-          const reader = new FileReader();
-          function decodedDone(decoded) {
-            new Float32Array(decoded.length);
-            decoded.getChannelData(0);
-          }
-          reader.onload = async function () {
-            const arrayBuffer = reader.result;
-            res({
-              name: track.name,
-              data: await audioContext.decodeAudioData(
-                arrayBuffer,
-                decodedDone
-              ),
-            });
-          };
-          reader.readAsArrayBuffer(trackFile);
-        })
-      );
+      if (trackIsAudio) {
+        if (byPassTrackMetaValidation) {
+          tracks.push(track);
+        } else {
+          const trackFile = await track.getFile();
+          tracks.push(
+            new Promise((res, rej) => {
+              const audioContext = new AudioContext();
+              const reader = new FileReader();
+              function decodedDone(decoded) {
+                new Float32Array(decoded.length);
+                decoded.getChannelData(0);
+              }
+              reader.onload = async function () {
+                const arrayBuffer = reader.result;
+                res({
+                  name: track.name,
+                  data: await audioContext.decodeAudioData(
+                    arrayBuffer,
+                    decodedDone
+                  ),
+                });
+              };
+              reader.readAsArrayBuffer(trackFile);
+            })
+          );
+        }
+      }
+      if (trackIsMidi) {
+        /* TODO: add to midi infor on song. */
+        newSong.midiFile = {
+          id: crypto.randomUUID(),
+          fileName: track?.name,
+          filePath: `#{directory}${setlistName}/${song.name}/${track.name}`,
+        };
+      }
     }
     const tracksData = await Promise.all(tracks);
     /*
@@ -625,9 +641,8 @@ export const onDrop = async (event, session) => {
           data
         );
         if (incIndex > 6) return;
-        newSong.outputs[`output${incIndex}`][
-          `IN${incIndex}`
-        ].songFileId = `F${incIndex}`;
+        newSong.outputs[`output${incIndex}`][`IN${incIndex}`].songFileId =
+          `F${incIndex}`;
         newSong.outputs[`output${incIndex}`][`IN${incIndex}`].active = true;
       });
     addSongToSession(
