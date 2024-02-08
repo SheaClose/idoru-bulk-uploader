@@ -8,6 +8,7 @@ import { get } from "lodash";
 import { useOutletContext } from "react-router-dom";
 import { Draggable } from "react-beautiful-dnd";
 import { toast } from "react-hot-toast";
+
 const Track = ({
   inputId,
   songFileId,
@@ -262,10 +263,7 @@ const Track = ({
                       );
                     }}
                   />
-                  <span
-                    {...draggableProvided.dragHandleProps}
-                    className="hover:!cursor-grab"
-                  >
+                  <span {...draggableProvided.dragHandleProps}>
                     <Button theme="actionButton" label={<DragHandle />} />
                   </span>
                 </>

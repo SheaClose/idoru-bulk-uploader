@@ -12,6 +12,7 @@ import { cloneDeep } from "lodash";
 import Button from "../../Components/Button";
 import PopOver from "../../Components/PopOver";
 import { toast } from "react-hot-toast";
+
 const Songs = () => {
   let { playListId } = useParams();
   const {
@@ -159,7 +160,6 @@ const Songs = () => {
                           <span {...draggableProvided.dragHandleProps}>
                             <Button
                               theme="actionButton"
-                              onWaiting={() => console.log("Hover")}
                               label={<DragHandle />}
                             />
                           </span>

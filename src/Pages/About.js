@@ -13,9 +13,6 @@ const About = () => {
       >
         <div className="absolute opacity-10"></div>
       </div>
-      {/* <div className="header-image">
-        <img className="w-full h-96" src={p1Img} alt="idoru p-1 pedal" />
-      </div> */}
       <div className="text-2xl font-extrabold text-[--btn-text-hover]">
         The (Unofficial) Idoru P-1 Bulk Uploader
       </div>
