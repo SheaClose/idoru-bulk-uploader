@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import SetList from "./Pages/SetList/SetList";
+import About from "./Pages/About";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
       {
         path: "setlist/:playListId",
         element: <SetList />,
+      },
+      {
+        path: "",
+        element: <About />,
       },
     ],
   },

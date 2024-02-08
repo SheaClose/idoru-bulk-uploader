@@ -69,7 +69,7 @@ const PlayList = () => {
             />
           </FormFieldWrapper>
         </div>
-        {playlist.hasOwnProperty("filePath") ? (
+        {playlist?.hasOwnProperty("filePath") ? (
           <div className="flex items-center gap-4">
             <Folder />
             <FormFieldWrapper id="src-path">

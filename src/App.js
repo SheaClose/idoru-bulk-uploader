@@ -11,6 +11,7 @@ import { FileDrop } from "react-file-drop";
 import { onDrop, generateNewTrack } from "./resources/parseFiles";
 import Spinner from "./Components/Spinner";
 import toast, { Toaster } from "react-hot-toast";
+import { Link } from "react-router-dom";
 function App() {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -176,10 +177,10 @@ function App() {
       {loading ? <Spinner /> : null}
       <Toaster toastOptions={{ duration: 5000 }} />
       <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
-        <div className="flex gap-4 items-center font-bold text-2xl">
+        <Link to="/" className="flex gap-4 items-center font-bold text-2xl">
           <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
           <span>Idoru-P1 Bulk Uploader (Un-Official)</span>
-        </div>
+        </Link>
         <div className="flex gap-4 items-center">
           <FormFieldWrapper id="end-of-song">
             <select
