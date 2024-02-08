@@ -8,6 +8,7 @@ import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
 
+const titleReg = /^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$/gi;
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -96,6 +97,7 @@ const PlayList = () => {
               <div className="flex items-center relative">
                 <Input
                   placeholder="Path to Directory"
+                  required={true}
                   id="src-path"
                   name="src-path"
                   type="text"

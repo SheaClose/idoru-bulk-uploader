@@ -8,11 +8,12 @@ import Track from "./Track";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { useOutletContext } from "react-router-dom";
 import { DragDropContext } from "react-beautiful-dnd";
-import { cloneDeep } from "lodash";
+import { cloneDeep, merge, pick } from "lodash";
 import Button from "../../Components/Button";
 import PopOver from "../../Components/PopOver";
 import { toast } from "react-hot-toast";
 
+const titleReg = /^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$/gi;
 const Songs = () => {
   let { playListId } = useParams();
   const {
@@ -65,16 +66,23 @@ const Songs = () => {
   };
 
   const handleCopy = (song) => {
-    navigator.clipboard.writeText(JSON.stringify(song));
+    const trackKeys = Object.keys(song?.inputFiles);
+    const displayNamePaths = trackKeys.map(
+      (track) => `inputFiles.${track}.displayName`
+    );
+    navigator.clipboard.writeText(
+      JSON.stringify(pick(song, ["endOfSong", ...displayNamePaths, "outputs"]))
+    );
     toast.success("Copied Song Configuration to Clipboard!");
   };
 
-  const handlePaste = async (song) => {
+  const handlePaste = async (song, songIndex) => {
     try {
+      const targetSong = cloneDeep(song);
       const text = await navigator.clipboard.readText();
-      const songConfiguration = JSON.parse(text);
-      console.log("songConfiguration: ", songConfiguration);
-      /* TODO: handle pasting configuration  */
+      const sourceSongConfiguration = JSON.parse(text);
+      const mergedSong = merge(targetSong, sourceSongConfiguration);
+      setSession(`songs[${songIndex}]`, mergedSong);
     } catch (error) {
       console.warn("error: ", error?.message);
       if (error?.message.includes("not valid JSON"))
@@ -107,8 +115,11 @@ const Songs = () => {
                           <span className="absolute inset-x-2 inset-y-4 w-1">
                             {playlistSongIndex + 1}.
                           </span>
+                          {/* TODO: make pattern work */}
                           <FormFieldWrapper id="song-title">
                             <Input
+                              required={true}
+                              pattern="^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$"
                               placeholder="Song Title"
                               id="song-title"
                               type="text"
@@ -181,37 +192,34 @@ const Songs = () => {
                                       <p>Copy song Configuration: </p>
                                       <p>
                                         End of Song Behavior, Track display
-                                        names, Input/Output routing{" "}
+                                        names, Input/Output routing
                                       </p>
                                     </>
                                   }
                                 >
                                   <Button
                                     theme="actionButton"
-                                    title="Copy Song Configuration \n\n Copies track routing"
                                     label={<Copy />}
                                     onClick={() => handleCopy(song)}
                                   />
                                 </PopOver>
-
                                 <PopOver
-                                  onClick={() => handlePaste(song)}
+                                  onClick={() => handlePaste(song, songIndex)}
                                   popoverChildren={
                                     <>
                                       <p>Paste song Configuration: </p>
                                       <p>
                                         End of Song Behavior, Track display
-                                        names, Input/Output routing{" "}
+                                        names, Input/Output routing
                                       </p>
                                     </>
                                   }
                                 >
-                                  {" "}
                                   <Button
                                     theme="actionButton"
                                     title="Paste Song Configuration"
                                     label={<Paste />}
-                                    onClick={() => handlePaste(song)}
+                                    onClick={() => handlePaste(song, songIndex)}
                                   />
                                 </PopOver>
                                 <Button
