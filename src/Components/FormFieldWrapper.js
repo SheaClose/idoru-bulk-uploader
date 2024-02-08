@@ -1,8 +1,8 @@
 import React from "react";
-
-const FormFieldWrapper = ({ label, id, children }) => {
+import classnames from "classnames";
+const FormFieldWrapper = ({ label, id, children, className }) => {
   return (
-    <div className="flex flex-col">
+    <div className={classnames("flex flex-col", className)}>
       {label && <label htmlFor={id}>{label}</label>}
       {children}
     </div>

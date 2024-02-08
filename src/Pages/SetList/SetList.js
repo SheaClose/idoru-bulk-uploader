@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../Components/Input";
 import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { Playlist, Help, Folder, Close } from "../../Components/Icons";
+import { Playlist, Help, Folder, Delete } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
@@ -39,19 +39,39 @@ const PlayList = () => {
   return (
     <div className="w-full text-white p-8">
       {session?.playlists?.length ? (
-        <div className="pb-8 mt-[-1rem] w-full flex justify-end">
-          <FormFieldWrapper id="session-name">
-            <Input
-              placeholder="Session Name"
-              id="session-name"
-              name="session-name"
-              type="text"
-              value={session?.session?.name}
-              onChange={(e) => {
-                setSession(`session.name`, e.target.value);
-              }}
-            />
-          </FormFieldWrapper>
+        <div className="flex justify-between mt-[-1rem] mb-8">
+          <select
+            id="end-of-song"
+            name="play-next"
+            className="py-4 pl-1 pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] w-96 rounded-md text-white"
+            value={playListId || ""}
+            onChange={(e) => {
+              navigate(`/setlist/${e.target.value}`);
+            }}
+          >
+            <option disabled key={"null"} value="">
+              Set Lists
+            </option>
+            {session?.playlists?.map((playlist) => (
+              <option key={playlist?.id} value={playlist?.id}>
+                {playlist?.name}{" "}
+              </option>
+            ))}
+          </select>
+          <div className="w-full flex justify-end">
+            <FormFieldWrapper id="session-name">
+              <Input
+                placeholder="Session Name"
+                id="session-name"
+                name="session-name"
+                type="text"
+                value={session?.session?.name}
+                onChange={(e) => {
+                  setSession(`session.name`, e.target.value);
+                }}
+              />
+            </FormFieldWrapper>
+          </div>
         </div>
       ) : null}
       <div className="w-full flex gap-8 py-2">
@@ -116,8 +136,7 @@ const PlayList = () => {
           theme="actionButton"
           style={{ marginLeft: "-1rem" }}
           title="Delete Setlist"
-          autoFocus={true}
-          label={<Close />}
+          label={<Delete />}
           onClick={() => {
             if (byPassConfirmation) {
               return handleSetlistDelete();
@@ -131,6 +150,7 @@ const PlayList = () => {
                       <input
                         value={byPassConfirmation}
                         type="checkbox"
+                        autoFocus
                         name=""
                         id=""
                         onChange={({ target }) =>

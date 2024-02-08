@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./App.css";
 import idoruLogo from "./resources/Idoru-Logo-word_Dark.png";
-import Button from "./Components/Button";
-import FileImport from "./Components/FileImport";
+import Slide from "./Components/Slide";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
@@ -158,7 +157,7 @@ function App() {
       `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
           
           Like, seriously, if the spinner's running, we're processing, go get a tea or something.`,
-      { duration: 7000 }
+      { duration: 70000 }
     );
     const { newSession, latestSetlistId } =
       (await onDrop(event, session)) || {};
@@ -171,65 +170,52 @@ function App() {
     navigate(`/setlist/${latestSetlistId}`);
   };
 
+  const onNavItemSelect = (navItem, ...args) => {
+    switch (navItem) {
+      case "Import":
+        handleImport(...args);
+        break;
+
+      case "Export":
+        handleExport();
+        break;
+
+      case "Reset":
+        setSession("", {
+          session: {
+            checkMissingFiles: false,
+            deviceImport: false,
+            filePath: "",
+            id: crypto.randomUUID(),
+            name: "",
+            playlists: [],
+          },
+          playlists: [],
+          songs: [],
+        });
+        navigate("/");
+        break;
+
+      case "Help":
+        navigate("/help");
+        break;
+
+      default:
+        break;
+    }
+  };
   return (
     <div className="app">
       {/* <Modal /> */}
       {loading ? <Spinner /> : null}
       <Toaster toastOptions={{ duration: 5000 }} />
-      <nav className="w-full px-16 py-8 text-white bg-black flex justify-between">
+
+      <nav className="w-full p-8 md:pl-16 pr-6 md:py-8 text-white bg-black flex justify-between items-center">
         <Link to="/" className="flex gap-4 items-center font-bold text-2xl">
           <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
-          <span>Idoru-P1 Bulk Uploader (Un-Official)</span>
+          <div className="flex flex-col">Idoru-P1 Bulk Uploader</div>
         </Link>
-        <div className="flex gap-4 items-center">
-          <FormFieldWrapper id="end-of-song">
-            <select
-              id="end-of-song"
-              name="play-next"
-              className="py-4 pl-1 pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] w-32 rounded-md text-white"
-              value={playListId || ""}
-              onChange={(e) => {
-                navigate(`/setlist/${e.target.value}`);
-              }}
-            >
-              <option disabled key={"null"} value="">
-                Set Lists
-              </option>
-              {session?.playlists?.map((playlist) => (
-                <option key={playlist?.id} value={playlist?.id}>
-                  {playlist?.name}{" "}
-                </option>
-              ))}
-            </select>
-          </FormFieldWrapper>
-          {window.location.hostname === "localhost" ? (
-            <Button
-              label="Reset"
-              theme={"secondary"}
-              onClick={() => {
-                setSession("", {
-                  session: {
-                    checkMissingFiles: false,
-                    deviceImport: false,
-                    filePath: "",
-                    id: crypto.randomUUID(),
-                    name: "",
-                    playlists: [],
-                  },
-                  playlists: [],
-                  songs: [],
-                });
-                navigate("/");
-              }}
-            />
-          ) : null}
-          <Button label="Export" theme={"secondary"} onClick={handleExport} />
-          <FileImport
-            onFileUpload={handleImport}
-            label="Import"
-            accept=".idoru,.json"
-          />
-        </div>
+        <Slide onNavItemSelect={onNavItemSelect} />
       </nav>
       <DragDropContext onDragEnd={onDragEnd}>
         <FileDrop onFrameDrop={onFrameDrop}>
@@ -239,6 +225,10 @@ function App() {
 
             onDragLeave: function(event): Callback when the user leaves the target. Removes the file-drop-dragging-over-target class from the file-drop-target.
           */}
+          <FormFieldWrapper
+            id="end-of-song"
+            className="w-full"
+          ></FormFieldWrapper>
           <Outlet
             context={{
               session,

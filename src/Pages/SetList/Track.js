@@ -3,7 +3,7 @@ import Input from "../../Components/Input";
 import Checkbox from "../../Components/Checkbox";
 import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { Close, DragHandle, HeadPhones, Note } from "../../Components/Icons";
+import { Delete, DragHandle, HeadPhones, Note } from "../../Components/Icons";
 import { get } from "lodash";
 import { useOutletContext } from "react-router-dom";
 import { Draggable } from "react-beautiful-dnd";
@@ -215,8 +215,7 @@ const Track = ({
                   <Button
                     theme="actionButton"
                     title="Delete Track"
-                    autoFocus={true}
-                    label={<Close />}
+                    label={<Delete />}
                     onClick={() => {
                       if (byPassConfirmation) {
                         return handleDeleteTrack();
@@ -231,6 +230,7 @@ const Track = ({
                                   value={byPassConfirmation}
                                   type="checkbox"
                                   name=""
+                                  autoFocus
                                   id=""
                                   onChange={({ target }) =>
                                     setByPassConfirmation(target?.checked)

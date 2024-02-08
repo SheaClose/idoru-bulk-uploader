@@ -5,7 +5,6 @@ const Button = ({
   label,
   onClick,
   disabled,
-  autoFocus,
   ...buttonProps
 }) => {
   const themeHash = {
@@ -17,7 +16,6 @@ const Button = ({
   return (
     <button
       disabled={disabled}
-      autoFocus={autoFocus}
       className={`p-4 w-32 text-md rounded-md ${themeHash[theme]}`}
       onClick={onClick}
       {...buttonProps}

@@ -5,7 +5,7 @@ const FileImport = ({ onFileUpload, label, accept }) => {
   const inputRef = useRef(null);
   const handleClick = () => inputRef?.current?.click();
   return (
-    <>
+    <span onClick={handleClick}>
       <input
         ref={inputRef}
         type="file"
@@ -14,8 +14,8 @@ const FileImport = ({ onFileUpload, label, accept }) => {
         style={{ display: "none" }}
         onChange={onFileUpload}
       />
-      <Button label={label} onClick={handleClick} />
-    </>
+      {label}
+    </span>
   );
 };
 

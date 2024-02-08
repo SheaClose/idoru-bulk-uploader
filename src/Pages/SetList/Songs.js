@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { DragHandle, Close } from "../../Components/Icons";
+import { DragHandle, Delete, Copy, Paste } from "../../Components/Icons";
 import Input from "../../Components/Input";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
 import Accordian from "../../Components/Accordian";
@@ -10,6 +10,7 @@ import { useOutletContext } from "react-router-dom";
 import { DragDropContext } from "react-beautiful-dnd";
 import { cloneDeep } from "lodash";
 import Button from "../../Components/Button";
+import PopOver from "../../Components/PopOver";
 import { toast } from "react-hot-toast";
 const Songs = () => {
   let { playListId } = useParams();
@@ -60,6 +61,28 @@ const Songs = () => {
       [`songs`, songs],
       [`playlists.[${playlistIndex}].songs`, playListSongs],
     ]);
+  };
+
+  const handleCopy = (song) => {
+    navigator.clipboard.writeText(JSON.stringify(song));
+    toast.success("Copied Song Configuration to Clipboard!");
+  };
+
+  const handlePaste = async (song) => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const songConfiguration = JSON.parse(text);
+      console.log("songConfiguration: ", songConfiguration);
+      /* TODO: handle pasting configuration  */
+    } catch (error) {
+      console.warn("error: ", error?.message);
+      if (error?.message.includes("not valid JSON"))
+        return toast.error(
+          "Invalid song configuration pasted. \n\n You might have copied something else to your clipboard, try copying and pasting again",
+          { duration: 5000 }
+        );
+      toast.error("Something went wrong!");
+    }
   };
   return (
     <Droppable droppableId={playListId}>
@@ -133,63 +156,10 @@ const Songs = () => {
                               }}
                             />
                           </FormFieldWrapper>
-                          <Button
-                            theme="actionButton"
-                            title="Delete Song"
-                            label={<Close />}
-                            onClick={() => {
-                              if (byPassConfirmation)
-                                return handleSongDelete(song.id);
-                              toast.custom(
-                                <div className="bg-[--btn] text-white p-4">
-                                  <div className="flex gap-4 items-center">
-                                    <div className="flex flex-col items-start gap-4">
-                                      <div>You really wanna do that?</div>
-                                      <div className="flex gap-2 text-xs">
-                                        <input
-                                          value={byPassConfirmation}
-                                          type="checkbox"
-                                          name=""
-                                          id=""
-                                          onChange={({ target }) =>
-                                            setByPassConfirmation(
-                                              target?.checked
-                                            )
-                                          }
-                                        />
-                                        (Don't remind me again)
-                                      </div>
-                                    </div>
-                                    <span className="border-[1px] border-[--white] rounded-md">
-                                      <Button
-                                        theme="secondary"
-                                        label={"Nope"}
-                                        onClick={() => toast.remove()}
-                                      />
-                                    </span>
-                                    <Button
-                                      label={"Yep"}
-                                      autoFocus={true}
-                                      onClick={() => {
-                                        handleSongDelete(song.id);
-                                        toast.remove();
-                                      }}
-                                    />
-                                  </div>
-                                </div>,
-                                {
-                                  position: "top-center",
-                                  duration: 20000,
-                                }
-                              );
-                            }}
-                          />
-                          <span
-                            {...draggableProvided.dragHandleProps}
-                            className="hover:!cursor-grab"
-                          >
+                          <span {...draggableProvided.dragHandleProps}>
                             <Button
                               theme="actionButton"
+                              onWaiting={() => console.log("Hover")}
                               label={<DragHandle />}
                             />
                           </span>
@@ -203,6 +173,99 @@ const Songs = () => {
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
+                              <div className="pl-10 flex gap-2">
+                                <PopOver
+                                  onClick={() => handleCopy(song)}
+                                  popoverChildren={
+                                    <>
+                                      <p>Copy song Configuration: </p>
+                                      <p>
+                                        End of Song Behavior, Track display
+                                        names, Input/Output routing{" "}
+                                      </p>
+                                    </>
+                                  }
+                                >
+                                  <Button
+                                    theme="actionButton"
+                                    title="Copy Song Configuration \n\n Copies track routing"
+                                    label={<Copy />}
+                                    onClick={() => handleCopy(song)}
+                                  />
+                                </PopOver>
+
+                                <PopOver
+                                  onClick={() => handlePaste(song)}
+                                  popoverChildren={
+                                    <>
+                                      <p>Paste song Configuration: </p>
+                                      <p>
+                                        End of Song Behavior, Track display
+                                        names, Input/Output routing{" "}
+                                      </p>
+                                    </>
+                                  }
+                                >
+                                  {" "}
+                                  <Button
+                                    theme="actionButton"
+                                    title="Paste Song Configuration"
+                                    label={<Paste />}
+                                    onClick={() => handlePaste(song)}
+                                  />
+                                </PopOver>
+                                <Button
+                                  theme="actionButton"
+                                  title="Delete Song"
+                                  label={<Delete />}
+                                  onClick={() => {
+                                    if (byPassConfirmation)
+                                      return handleSongDelete(song.id);
+                                    toast.custom(
+                                      <div className="bg-[--btn] text-white p-4">
+                                        <div className="flex gap-4 items-center">
+                                          <div className="flex flex-col items-start gap-4">
+                                            <div>You really wanna do that?</div>
+                                            <div className="flex gap-2 text-xs">
+                                              <input
+                                                autoFocus
+                                                value={byPassConfirmation}
+                                                type="checkbox"
+                                                name=""
+                                                id=""
+                                                onChange={({ target }) =>
+                                                  setByPassConfirmation(
+                                                    target?.checked
+                                                  )
+                                                }
+                                              />
+                                              (Don't remind me again)
+                                            </div>
+                                          </div>
+                                          <span className="border-[1px] border-[--white] rounded-md">
+                                            <Button
+                                              theme="secondary"
+                                              label={"Nope"}
+                                              onClick={() => toast.remove()}
+                                            />
+                                          </span>
+                                          <Button
+                                            label={"Yep"}
+                                            onClick={() => {
+                                              handleSongDelete(song.id);
+                                              toast.remove();
+                                            }}
+                                          />
+                                        </div>
+                                      </div>,
+                                      {
+                                        position: "top-center",
+                                        duration: 20000,
+                                      }
+                                    );
+                                  }}
+                                />
+                              </div>
                               {Object.entries(song.inputFiles)
                                 // .slice(0, 6)
                                 .map(([songFileId, inputFile], index) => {
