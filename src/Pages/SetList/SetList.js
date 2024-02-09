@@ -8,7 +8,6 @@ import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
 
-const titleReg = /^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$/gi;
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
@@ -63,6 +62,7 @@ const PlayList = () => {
             <FormFieldWrapper id="session-name">
               <Input
                 placeholder="Session Name"
+                pattern="[A-Za-z0-9!@#$%^_=+\-&\(\) ]{0,32}"
                 id="session-name"
                 name="session-name"
                 type="text"
@@ -97,6 +97,7 @@ const PlayList = () => {
               <div className="flex items-center relative">
                 <Input
                   placeholder="Path to Directory"
+                  pattern="[A-Za-z0-9!@#$%^_=+\-&\(\) ]{0,32}"
                   required={true}
                   id="src-path"
                   name="src-path"

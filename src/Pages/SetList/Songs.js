@@ -13,7 +13,6 @@ import Button from "../../Components/Button";
 import PopOver from "../../Components/PopOver";
 import { toast } from "react-hot-toast";
 
-const titleReg = /^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$/gi;
 const Songs = () => {
   let { playListId } = useParams();
   const {
@@ -119,8 +118,9 @@ const Songs = () => {
                           <FormFieldWrapper id="song-title">
                             <Input
                               required={true}
-                              pattern="^[A-Za-z0-9!@#$%^_=+\-&()]{0,32}$"
+                              pattern="[A-Za-z0-9!@#$%^_=+\-&\(\) ]{0,32}"
                               placeholder="Song Title"
+                              maxLength={32}
                               id="song-title"
                               type="text"
                               value={song?.name}

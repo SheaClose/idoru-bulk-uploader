@@ -109,11 +109,6 @@ function App() {
   };
 
   const handleExport = () => {
-    /*
-      TODO: once drag import is done, address song locations based on:
-        session?.playlists?.[playlistIndex]?.filePath
-      Unless an *.idoru file was used for import.
-    */
     let canUpload = true;
     session.playlists.forEach((playlist, playlistIndex) => {
       if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
