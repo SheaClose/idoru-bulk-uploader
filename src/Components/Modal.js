@@ -14,11 +14,7 @@ const Modal = ({ isOpen, header, children, onConfirm, onCancel }) => {
             <hr />
             <div className="flex justify-end gap-4">
               <Button theme="secondary" label="Cancel" onClick={onCancel} />
-              <Button
-                onClick={() => onConfirm("accurate")}
-                label="Accurate Upload"
-              />
-              <Button onClick={() => onConfirm("fast")} label="Fast Upload" />
+              <Button onClick={onConfirm} label="Submit" />
             </div>
           </div>
         </div>

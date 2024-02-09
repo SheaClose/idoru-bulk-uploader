@@ -9,6 +9,7 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { set } from "lodash";
 import { FileDrop } from "react-file-drop";
 import { onDrop, generateNewTrack } from "./resources/parseFiles";
+import { handleAsyncFileTransfer } from "./resources/handleAsyncFileTransfer";
 import Spinner from "./Components/Spinner";
 import toast, { Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -21,8 +22,9 @@ function App() {
     JSON.parse(localStorage.getItem("iP1Session"))
   );
   const [loading, setLoading] = useState(false);
+  const [importMethod, setImportMethod] = useState("accurate");
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  /* const [droppedFiles, setDroppedFiles] = useState(null); */
+  const [droppedFiles, setDroppedFiles] = useState(null);
   const [byPassConfirmation, setByPassConfirmation] = useState(false);
   useEffect(() => {
     localStorage.setItem("iP1Session", JSON.stringify(session));
@@ -155,8 +157,8 @@ function App() {
     document.body.removeChild(element);
   };
 
-  const handleDroppedFilesImport = async (event) => {
-    // const event = droppedFiles;
+  const handleDroppedFilesImport = async () => {
+    /* TODO: update this to handle one track at a time, so there's not a long ass waiting game. */
     setLoading(true);
     toast(
       `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
@@ -165,7 +167,7 @@ function App() {
       { duration: 70000 }
     );
     const { newSession, latestSetlistId } =
-      (await onDrop(event, session)) || {};
+      (await onDrop(droppedFiles, session, importMethod === "fast")) || {};
     toast.remove();
     setLoading(false);
     if (!newSession) {
@@ -175,10 +177,10 @@ function App() {
     navigate(`/setlist/${latestSetlistId}`);
   };
 
-  /* const onFrameDrop = async (event) => {
-    setDroppedFiles(event);
+  const onFrameDrop = async (event) => {
+    setDroppedFiles(await handleAsyncFileTransfer(event));
     return setModalIsOpen(true);
-  }; */
+  };
 
   const onNavItemSelect = (navItem, ...args) => {
     switch (navItem) {
@@ -218,22 +220,50 @@ function App() {
     <div className="app">
       <Modal
         isOpen={modalIsOpen}
-        onConfirm={(method) => {
-          if (method === "accurate") {
-            setByPassConfirmation(false);
-          } else {
-            setByPassConfirmation(true);
-          }
-          handleDroppedFilesImport();
+        onConfirm={() => {
           setModalIsOpen(false);
+          handleDroppedFilesImport();
         }}
         onCancel={() => setModalIsOpen(false)}
         header="How do you want to upload?"
       >
         <div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi ratione
-          itaque animi deleniti magnam odio, ab dignissimos autem! Ipsum error
-          labore vero eligendi voluptatibus atque magnam quia et officiis culpa.{" "}
+          <div>
+            In order to accurately verify tracks can be used by your Idoru, each
+            song must be processed. Getting this information from within a
+            browser window can be slow. As an alternative, if you are certain
+            your tracks are valid (16-bit, 44.1k format .wav files,) you can
+            elect for a "fast" processing method. If you find that this doesn't
+            work when uploading to your P-1, you may need to re-try with the
+            "accurate" method.
+          </div>
+          <div className="flex flex-col gap-1 mt-4  ">
+            <div className="flex gap-2">
+              <input
+                defaultChecked
+                value={importMethod}
+                type="radio"
+                name="importMethod"
+                id="accurate"
+                onChange={() => {
+                  setImportMethod("accurate");
+                }}
+              />
+              <label htmlFor="accurate">Accurate</label>
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={importMethod}
+                type="radio"
+                name="importMethod"
+                id="fast"
+                onChange={() => {
+                  setImportMethod("fast");
+                }}
+              />
+              <label htmlFor="fast">Fast</label>
+            </div>
+          </div>
         </div>
       </Modal>
       {loading ? <Spinner /> : null}
@@ -247,7 +277,7 @@ function App() {
         <Slide onNavItemSelect={onNavItemSelect} />
       </nav>
       <DragDropContext onDragEnd={onDragEnd}>
-        <FileDrop onFrameDrop={handleDroppedFilesImport /* onFrameDrop */}>
+        <FileDrop onFrameDrop={onFrameDrop}>
           {/* 
             Todo: Style body based on drag event.
             onDragOver: function(event): Callback when the user is dragging over the target. Also adds the file-drop-dragging-over-target class to the file-drop-target.

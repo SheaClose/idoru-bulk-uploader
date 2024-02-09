@@ -1,4 +1,4 @@
-import { cloneDeep } from "lodash";
+import { cloneDeep, compact, set } from "lodash";
 import toast from "react-hot-toast";
 const supportsFileSystemAccessAPI =
   "getAsFileSystemHandle" in DataTransferItem.prototype;
@@ -541,11 +541,9 @@ export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
   return track;
 };
 
-export const onDrop = async (event, session) => {
-  const byPassTrackMetaValidation = Boolean(
-    localStorage.getItem("byPassTrackMetaValidation")
-  );
-  event.preventDefault();
+export const onDrop = async (files, session, byPassTrackMetaValidation) => {
+  /* TODO: update this to handle one track at a time, so there's not a long ass waiting game. */
+  if (!files) return;
   let newSession;
   /* Start new Session */
   if (!session) {
@@ -561,95 +559,98 @@ export const onDrop = async (event, session) => {
     return;
   }
 
-  const item = event?.dataTransfer?.items?.[0];
-  if (!item) return;
   let setlistName;
-  const setlist = await (supportsFileSystemAccessAPI
-    ? item.getAsFileSystemHandle()
-    : item.webkitGetAsEntry());
-  if (setlist?.kind !== "directory") {
-    toast.remove();
-    return toast("Setlist must be a directory!", { duration: 2000 });
-  }
-  setlistName = setlist.name;
+  setlistName = files.name;
+  delete files.name;
   let playlistId = addPlaylistToSession(newSession, setlistName);
-  for await (const song of setlist.values()) {
-    /* skip files (.DS_Store, etc) in song directory */
-    if (song?.kind !== "directory") continue;
-    const newSong = generateNewSong(song.name);
-    const tracks = [];
-    for await (const track of song.values()) {
-      const trackIsAudio = track.name.toLowerCase().includes(".wav");
-      const trackIsMidi = track.name.toLowerCase().includes(".mid");
-      /* ignore any further directories, focus only on files */
-      /* Only accept .wav files */
-      if (track?.kind !== "file" || !(trackIsAudio || trackIsMidi)) {
-        continue;
-      }
-      if (trackIsAudio) {
-        if (byPassTrackMetaValidation) {
-          tracks.push(track);
-        } else {
-          const trackFile = await track.getFile();
-          tracks.push(
-            new Promise((res, rej) => {
-              const audioContext = new AudioContext();
-              const reader = new FileReader();
-              function decodedDone(decoded) {
-                new Float32Array(decoded.length);
-                decoded.getChannelData(0);
-              }
-              reader.onload = async function () {
-                const arrayBuffer = reader.result;
-                res({
-                  name: track.name,
-                  data: await audioContext.decodeAudioData(
-                    arrayBuffer,
-                    decodedDone
-                  ),
-                });
-              };
-              reader.readAsArrayBuffer(trackFile);
-            })
-          );
-        }
-      }
-      if (trackIsMidi) {
-        /* TODO: add to midi infor on song. */
-        newSong.midiFile = {
-          id: crypto.randomUUID(),
-          fileName: track?.name,
-          filePath: `#{directory}${setlistName}/${song.name}/${track.name}`,
-        };
-      }
-    }
-    const tracksData = await Promise.all(tracks);
-    /*
+  await Promise.all(
+    Object.entries(files).map(async ([songName, tracks]) => {
+      const newSong = generateNewSong(songName);
+      const newTracks = compact(
+        tracks.map(async (track) => {
+          const trackIsAudio = track.name.toLowerCase().includes(".wav");
+          const trackIsMidi = track.name.toLowerCase().includes(".mid");
+          /* ignore any further directories, focus only on files */
+          /* Only accept .wav files */
+          if (track?.kind !== "file" || !(trackIsAudio || trackIsMidi)) {
+            return;
+          }
+          if (trackIsAudio) {
+            if (byPassTrackMetaValidation) {
+              return track;
+            } else {
+              const trackFile = await track.getFile();
+              return new Promise((res, rej) => {
+                const audioContext = new AudioContext();
+                const reader = new FileReader();
+                function decodedDone(decoded) {
+                  new Float32Array(decoded.length);
+                  decoded.getChannelData(0);
+                }
+                reader.onload = async function () {
+                  const arrayBuffer = reader.result;
+                  res({
+                    name: track.name,
+                    data: await audioContext.decodeAudioData(
+                      arrayBuffer,
+                      decodedDone
+                    ),
+                  });
+                };
+                reader.readAsArrayBuffer(trackFile);
+              });
+            }
+          }
+          if (trackIsMidi) {
+            /* TODO: add to midi infor on song. */
+            newSong.midiFile = {
+              id: crypto.randomUUID(),
+              fileName: track?.name,
+              filePath: `#{directory}${setlistName}/${songName}/${track.name}`,
+            };
+          }
+        })
+      );
+      const tracksData = await Promise.all(newTracks);
+      /*
       assign tracks to song input files,
       assign first 6 inputs to corresponding output.
     */
-    tracksData
-      .sort((a, z) => {
-        return a.name.toLowerCase().localeCompare(z.name.toLowerCase());
-      })
-      .forEach(({ name, data }, index) => {
-        const incIndex = index + 1;
-        newSong.inputFiles[`F${incIndex}`] = generateNewTrack(
-          incIndex,
-          name,
-          `${setlistName}/${song.name}/${name}`,
-          data
-        );
-        if (incIndex > 6) return;
-        newSong.outputs[`output${incIndex}`][`IN${incIndex}`].songFileId =
-          `F${incIndex}`;
-        newSong.outputs[`output${incIndex}`][`IN${incIndex}`].active = true;
-      });
-    addSongToSession(
-      newSession,
-      newSession.session.playlists.findIndex((c) => c === playlistId),
-      newSong
-    );
-  }
+      tracksData
+        .sort((a, z) => {
+          return a.name.toLowerCase().localeCompare(z.name.toLowerCase());
+        })
+        .forEach((track, index) => {
+          const { name, data } = track || {};
+          const incIndex = index + 1;
+          set(
+            newSong,
+            `inputFiles[F${incIndex}]`,
+            generateNewTrack(
+              incIndex,
+              name,
+              `${setlistName}/${songName}/${name}`,
+              data
+            )
+          );
+          if (incIndex > 6) return;
+          set(
+            newSong,
+            `outputs[output${incIndex}][IN${incIndex}].songFileId`,
+            `F${incIndex}`
+          );
+          set(
+            newSong,
+            `outputs[output${incIndex}][IN${incIndex}].active`,
+            true
+          );
+        });
+      addSongToSession(
+        newSession,
+        newSession.session.playlists.findIndex((c) => c === playlistId),
+        newSong
+      );
+    })
+  );
   return { newSession, latestSetlistId: playlistId };
 };
