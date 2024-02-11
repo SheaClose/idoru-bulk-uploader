@@ -118,6 +118,7 @@ const Songs = () => {
                           <FormFieldWrapper id="song-title">
                             <Input
                               required={true}
+                              warningLength={16}
                               pattern="[A-Za-z0-9!@#$%^_=+\-&\(\) ]{0,32}"
                               placeholder="Song Title"
                               maxLength={32}

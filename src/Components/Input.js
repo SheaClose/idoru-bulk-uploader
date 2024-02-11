@@ -1,21 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import cx from "classnames";
 /* TODO: add react-hook-form */
-const Input = (inputProps) => {
-  const [error /* setError */] = useState(null);
-  /* const ref = useRef(null);
+const Input = ({
+  placeholder,
+  className,
+  value,
+  maxLength,
+  onBlur,
+  onChange,
+  pattern,
+  id,
+  name: inputName,
+  type,
+  disabled,
+  readOnly,
+  required,
+  warningLength,
+}) => {
+  const [error, setError] = useState(null);
+  const [warning, setWarning] = useState(null);
+  const ref = useRef(null);
   useEffect(() => {
-    const validity = ref?.current?.validity;
-    const { valid, patternMismatch, tooLong, valueMissing } = validity || {};
+    const { valid, patternMismatch, tooLong, valueMissing } =
+      ref?.current?.validity || {};
     const errorMessage = valid
       ? ""
       : valueMissing
-        ? "Missing required value"
-        : tooLong
-          ? "Value too long"
-          : patternMismatch
-            ? "Invalid character used"
-            : null;
+      ? "Missing required value"
+      : tooLong
+      ? "Value too long"
+      : patternMismatch
+      ? "Invalid character used"
+      : null;
     setError(
       errorMessage ? (
         <span className="text-[#F00] text-xs absolute -top-4">
@@ -23,25 +39,49 @@ const Input = (inputProps) => {
         </span>
       ) : null
     );
-  }, [ref]); */
+  }, [ref.current, value]);
+  useEffect(() => {
+    const warning =
+      value?.length > warningLength
+        ? "Titles over 16 characters are not recommended"
+        : null;
+    setWarning(
+      warning ? (
+        <span className="text-[rgba(255,125,0,0.7)] text-xs absolute -top-4">
+          {warning}
+        </span>
+      ) : null
+    );
+  }, [value]);
 
   return (
     <div className="relative">
-      {error}
+      {error ? error : warning ? warning : null}
       <div className="flex has-[input:invalid]:ring-red-700 has-[input:invalid]:ring-1">
-        {inputProps.placeholder ? (
+        {placeholder ? (
           <div className="px-2 flex items-center rounded-l-md bg-[--btn] text-xs text-center">
-            {inputProps.placeholder}:{" "}
+            {placeholder}:{" "}
           </div>
         ) : null}
         <input
-          {...inputProps}
+          ref={ref}
+          onChange={onChange}
+          placeholder={placeholder}
+          pattern={pattern}
+          id={id}
+          name={inputName}
+          required={required}
+          type={type}
           className={cx(
             "p-4 bg-[--btn] max-w-96 rounded-r-md",
-            { "rounded-l-md": !inputProps.placeholder },
-            inputProps.className
+            { "rounded-l-md": !placeholder },
+            className
           )}
-          value={inputProps.value}
+          value={value}
+          onBlur={onBlur}
+          disabled={disabled}
+          readOnly={readOnly}
+          maxLength={maxLength}
         />
       </div>
     </div>

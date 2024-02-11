@@ -73,11 +73,19 @@ function App() {
 
   const handleImport = (e) => {
     if (!e?.target?.files?.length) return;
+    const sessionName = e?.target?.files[0]?.name;
     setLoading(true);
     const fileReader = new FileReader();
     fileReader.onload = function (e) {
       const text = e.target.result;
-      setSession("", JSON.parse(text));
+      const session = JSON.parse(text);
+      if (
+        !session?.session?.name ||
+        session?.session?.name === "Unnamed Session"
+      ) {
+        set(session, "session.name", sessionName.split(".idoru")[0]);
+      }
+      setSession("", session);
       setLoading(false);
       navigate(`/setlist/${JSON.parse(text)?.playlists?.[0]?.id}`);
     };
