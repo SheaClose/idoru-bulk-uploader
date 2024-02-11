@@ -211,6 +211,11 @@ function App() {
         navigate("/");
         break;
 
+      case "Setlist":
+        const setlistId = session?.session?.playlists?.[0];
+        navigate(`/setlist/${setlistId}`);
+        break;
+
       case "Help":
         navigate("/help");
         break;

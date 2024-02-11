@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import cx from "classnames";
-/* TODO: add react-hook-form */
+import Tooltip from "@mui/material/Tooltip";
+
 const Input = ({
   placeholder,
   className,
@@ -16,6 +17,7 @@ const Input = ({
   readOnly,
   required,
   warningLength,
+  title,
 }) => {
   const [error, setError] = useState(null);
   const [warning, setWarning] = useState(null);
@@ -55,36 +57,38 @@ const Input = ({
   }, [value]);
 
   return (
-    <div className="relative">
-      {error ? error : warning ? warning : null}
-      <div className="flex has-[input:invalid]:ring-red-700 has-[input:invalid]:ring-1">
-        {placeholder ? (
-          <div className="px-2 flex items-center rounded-l-md bg-[--btn] text-xs text-center">
-            {placeholder}:{" "}
-          </div>
-        ) : null}
-        <input
-          ref={ref}
-          onChange={onChange}
-          placeholder={placeholder}
-          pattern={pattern}
-          id={id}
-          name={inputName}
-          required={required}
-          type={type}
-          className={cx(
-            "p-4 bg-[--btn] max-w-96 rounded-r-md",
-            { "rounded-l-md": !placeholder },
-            className
-          )}
-          value={value}
-          onBlur={onBlur}
-          disabled={disabled}
-          readOnly={readOnly}
-          maxLength={maxLength}
-        />
+    <Tooltip enterDelay={1000} title={title} leaveDelay={0}>
+      <div className="relative">
+        {error ? error : warning ? warning : null}
+        <div className="flex has-[input:invalid]:ring-red-700 has-[input:invalid]:ring-1">
+          {placeholder ? (
+            <div className="px-2 flex items-center rounded-l-md bg-[--btn] text-xs text-center">
+              {placeholder}:{" "}
+            </div>
+          ) : null}
+          <input
+            ref={ref}
+            onChange={onChange}
+            placeholder={placeholder}
+            pattern={pattern}
+            id={id}
+            name={inputName}
+            required={required}
+            type={type}
+            className={cx(
+              "p-4 bg-[--btn] max-w-96 rounded-r-md",
+              { "rounded-l-md": !placeholder },
+              className
+            )}
+            value={value}
+            onBlur={onBlur}
+            disabled={disabled}
+            readOnly={readOnly}
+            maxLength={maxLength}
+          />
+        </div>
       </div>
-    </div>
+    </Tooltip>
   );
 };
 

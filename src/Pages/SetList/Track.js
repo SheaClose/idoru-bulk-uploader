@@ -264,7 +264,11 @@ const Track = ({
                     }}
                   />
                   <span {...draggableProvided.dragHandleProps}>
-                    <Button theme="actionButton" label={<DragHandle />} />
+                    <Button
+                      title="Move Track in Song"
+                      theme="actionButton"
+                      label={<DragHandle />}
+                    />
                   </span>
                 </>
               ) : null}

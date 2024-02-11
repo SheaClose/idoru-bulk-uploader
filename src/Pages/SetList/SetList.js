@@ -100,6 +100,9 @@ const PlayList = () => {
                   id="src-path"
                   name="src-path"
                   type="text"
+                  title="Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. 
+                  
+                  See the FAQ for more information."
                   value={session?.playlists?.[playlistIndex]?.filePath || ""}
                   onBlur={(e) => {
                     let filePath = e?.target?.value;
@@ -118,17 +121,6 @@ const PlayList = () => {
                     )
                   }
                 />
-                <span
-                  className="absolute inset-t-2 right-2 hover:cursor-pointer"
-                  onClick={() =>
-                    toast(
-                      `Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. \n\nSee the FAQ for more information.`,
-                      { duration: 10000 }
-                    )
-                  }
-                >
-                  <Help height={14} width={14} />
-                </span>
               </div>
             </FormFieldWrapper>
           </div>

@@ -171,6 +171,7 @@ const Songs = () => {
                           </FormFieldWrapper>
                           <span {...draggableProvided.dragHandleProps}>
                             <Button
+                              title="Move Song in Setlist"
                               theme="actionButton"
                               label={<DragHandle />}
                             />
@@ -186,43 +187,21 @@ const Songs = () => {
                               {...provided.droppableProps}
                             >
                               <div className="pl-10 flex gap-2">
-                                <PopOver
+                                <Button
+                                  title="Copy song Configuration: \n\n End of Song Behavior, Track display names, Input/Output routing"
+                                  theme="actionButton"
+                                  label={<Copy />}
                                   onClick={() => handleCopy(song)}
-                                  popoverChildren={
-                                    <>
-                                      <p>Copy song Configuration: </p>
-                                      <p>
-                                        End of Song Behavior, Track display
-                                        names, Input/Output routing
-                                      </p>
-                                    </>
-                                  }
-                                >
-                                  <Button
-                                    theme="actionButton"
-                                    label={<Copy />}
-                                    onClick={() => handleCopy(song)}
-                                  />
-                                </PopOver>
-                                <PopOver
+                                />
+
+                                <Button
+                                  theme="actionButton"
+                                  title="Paste Song Configuration: \n\n End of Song Behavior, Track display
+                                  names, Input/Output routing"
+                                  label={<Paste />}
                                   onClick={() => handlePaste(song, songIndex)}
-                                  popoverChildren={
-                                    <>
-                                      <p>Paste song Configuration: </p>
-                                      <p>
-                                        End of Song Behavior, Track display
-                                        names, Input/Output routing
-                                      </p>
-                                    </>
-                                  }
-                                >
-                                  <Button
-                                    theme="actionButton"
-                                    title="Paste Song Configuration"
-                                    label={<Paste />}
-                                    onClick={() => handlePaste(song, songIndex)}
-                                  />
-                                </PopOver>
+                                />
+
                                 <Button
                                   theme="actionButton"
                                   title="Delete Song"

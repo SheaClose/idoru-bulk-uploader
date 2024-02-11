@@ -52,6 +52,9 @@ const Slide = ({ onNavItemSelect }) => {
             <li onClick={() => onNavItemSelect("Export")} className="p-2">
               Export
             </li>
+            <li onClick={() => onNavItemSelect("Setlist")} className="p-2">
+              Setlists
+            </li>
             <li onClick={() => onNavItemSelect("Reset")} className="p-2">
               Reset
             </li>

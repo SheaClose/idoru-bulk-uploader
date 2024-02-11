@@ -12,6 +12,10 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
+        path: "setlist/",
+        element: <SetList />,
+      },
+      {
         path: "setlist/:playListId",
         element: <SetList />,
       },
