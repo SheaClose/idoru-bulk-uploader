@@ -22,6 +22,9 @@ function App() {
     JSON.parse(localStorage.getItem("iP1Session"))
   );
   const [loading, setLoading] = useState(false);
+  const [delimiter] = useState(
+    window?.navigator?.userAgent?.indexOf("Win") !== -1 ? "\\" : "/"
+  );
   const [importMethod, setImportMethod] = useState("accurate");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [droppedFiles, setDroppedFiles] = useState(null);
@@ -131,7 +134,13 @@ function App() {
         const newF7 = generateNewTrack(7);
         newF7.directory = "";
         song.inputFiles = Object.entries(song.inputFiles)
-          .sort((a, z) => a[0].toUpperCase().localeCompare(z[0].toUpperCase()))
+          .sort((a, z) => {
+            const aNum = +a?.[0]?.split?.("F")?.[1];
+            const zNum = +z?.[0]?.split?.("F")?.[1];
+            if (!aNum || !zNum)
+              return a[0].toUpperCase().localeCompare(z[0].toUpperCase());
+            else return aNum - zNum;
+          })
           .slice(0, 6)
           .reduce((acc, [key, val]) => {
             val.directory = val.directory.replace(
@@ -170,7 +179,12 @@ function App() {
       { duration: 70000 }
     );
     const { newSession, latestSetlistId } =
-      (await onDrop(droppedFiles, session, importMethod === "fast")) || {};
+      (await onDrop(
+        droppedFiles,
+        session,
+        importMethod === "fast",
+        delimiter
+      )) || {};
     toast.remove();
     setLoading(false);
     if (!newSession) {
@@ -303,6 +317,7 @@ function App() {
               songsById,
               byPassConfirmation,
               setByPassConfirmation,
+              delimiter,
             }}
           />
         </FileDrop>

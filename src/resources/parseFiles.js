@@ -541,7 +541,12 @@ export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
   return track;
 };
 
-export const onDrop = async (files, session, byPassTrackMetaValidation) => {
+export const onDrop = async (
+  files,
+  session,
+  byPassTrackMetaValidation,
+  delimiter
+) => {
   /* TODO: update this to handle one track at a time, so there's not a long ass waiting game. */
   if (!files) return;
   let newSession;
@@ -606,7 +611,7 @@ export const onDrop = async (files, session, byPassTrackMetaValidation) => {
             newSong.midiFile = {
               id: crypto.randomUUID(),
               fileName: track?.name,
-              filePath: `#{directory}${setlistName}/${songName}/${track.name}`,
+              filePath: `#{directory}${setlistName}${delimiter}${songName}${delimiter}${track.name}`,
             };
           }
         })
@@ -616,7 +621,7 @@ export const onDrop = async (files, session, byPassTrackMetaValidation) => {
       assign tracks to song input files,
       assign first 6 inputs to corresponding output.
     */
-      tracksData
+      compact(tracksData)
         .sort((a, z) => {
           return a.name.toLowerCase().localeCompare(z.name.toLowerCase());
         })
@@ -629,7 +634,7 @@ export const onDrop = async (files, session, byPassTrackMetaValidation) => {
             generateNewTrack(
               incIndex,
               name,
-              `${setlistName}/${songName}/${name}`,
+              `${setlistName}${delimiter}${songName}${delimiter}${name}`,
               data
             )
           );

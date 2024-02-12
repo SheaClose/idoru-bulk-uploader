@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../Components/Input";
 import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { Playlist, Help, Folder, Delete } from "../../Components/Icons";
+import { Playlist, Folder, Delete } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
@@ -11,8 +11,13 @@ import toast from "react-hot-toast";
 const PlayList = () => {
   let { playListId } = useParams();
   const navigate = useNavigate();
-  const { session, setSession, byPassConfirmation, setByPassConfirmation } =
-    useOutletContext();
+  const {
+    session,
+    setSession,
+    byPassConfirmation,
+    setByPassConfirmation,
+    delimiter,
+  } = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
   );
@@ -100,15 +105,13 @@ const PlayList = () => {
                   id="src-path"
                   name="src-path"
                   type="text"
-                  title="Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. 
-                  
-                  See the FAQ for more information."
+                  title="Due to limitations of browsers, files imported will only include relative paths from the directory that is selected. In order to correctly export files in the Idoru app, the absolute path from the root of your computer must be provided. See the FAQ for more information."
                   value={session?.playlists?.[playlistIndex]?.filePath || ""}
                   onBlur={(e) => {
                     let filePath = e?.target?.value;
                     if (!filePath) return;
                     /* ensure file path ends in / */
-                    if (!filePath.endsWith("/")) filePath += "/";
+                    if (!filePath.endsWith(delimiter)) filePath += delimiter;
                     setSession(
                       `playlists[${playlistIndex}].filePath`,
                       filePath

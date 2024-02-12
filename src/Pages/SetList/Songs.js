@@ -10,7 +10,7 @@ import { useOutletContext } from "react-router-dom";
 import { DragDropContext } from "react-beautiful-dnd";
 import { cloneDeep, merge, pick } from "lodash";
 import Button from "../../Components/Button";
-import PopOver from "../../Components/PopOver";
+
 import { toast } from "react-hot-toast";
 
 const Songs = () => {
@@ -188,7 +188,7 @@ const Songs = () => {
                             >
                               <div className="pl-10 flex gap-2">
                                 <Button
-                                  title="Copy song Configuration: \n\n End of Song Behavior, Track display names, Input/Output routing"
+                                  title="Copy song Configuration: End of Song Behavior, Track display names, Input/Output routing"
                                   theme="actionButton"
                                   label={<Copy />}
                                   onClick={() => handleCopy(song)}
@@ -196,7 +196,7 @@ const Songs = () => {
 
                                 <Button
                                   theme="actionButton"
-                                  title="Paste Song Configuration: \n\n End of Song Behavior, Track display
+                                  title="Paste Song Configuration: End of Song Behavior, Track display
                                   names, Input/Output routing"
                                   label={<Paste />}
                                   onClick={() => handlePaste(song, songIndex)}
