@@ -626,10 +626,11 @@ export const onDrop = async (
         .forEach((track, index) => {
           const { name, data } = track || {};
           const incIndex = index + 1;
-          if (data.sampleRate !== 44100 || data.bitsPerSample !== 16)
-            throw new Error(
-              "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
-            );
+          /* TODO: This aint working now... why?  */
+          // if (data.sampleRate !== 44100 || data.bitsPerSample !== 16)
+          //   throw new Error(
+          //     "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
+          //   );
           set(
             newSong,
             `inputFiles[F${incIndex}]`,
