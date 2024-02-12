@@ -255,8 +255,9 @@ function App() {
             song must be processed. Getting this information from within a
             browser window can be slow. As an alternative, if you are certain
             your tracks are valid (16-bit, 44.1k format .wav files,) you can
-            elect for a "fast" processing method. If you find that this doesn't
-            work when uploading to your P-1, you may need to re-try with the
+            elect for a "fast" processing method (though this will also assume
+            all imported tracks are stereo). If you find that this doesn't work
+            when uploading to your P-1, you may need to re-try with the
             "accurate" method.
           </div>
           <div className="flex flex-col gap-1 mt-4  ">
@@ -300,12 +301,6 @@ function App() {
       </nav>
       <DragDropContext onDragEnd={onDragEnd}>
         <FileDrop onFrameDrop={onFrameDrop}>
-          {/* 
-            Todo: Style body based on drag event.
-            onDragOver: function(event): Callback when the user is dragging over the target. Also adds the file-drop-dragging-over-target class to the file-drop-target.
-
-            onDragLeave: function(event): Callback when the user leaves the target. Removes the file-drop-dragging-over-target class from the file-drop-target.
-          */}
           <FormFieldWrapper
             id="end-of-song"
             className="w-full"

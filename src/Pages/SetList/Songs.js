@@ -114,7 +114,6 @@ const Songs = () => {
                           <span className="absolute inset-x-2 inset-y-4 w-1">
                             {playlistSongIndex + 1}.
                           </span>
-                          {/* TODO: make pattern work */}
                           <FormFieldWrapper id="song-title">
                             <Input
                               required={true}

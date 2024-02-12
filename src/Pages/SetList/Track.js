@@ -102,9 +102,9 @@ const Track = ({
         directory: "",
         duration: 0,
         channelName: `Channel ${index + 1}`,
-        numberOfChannels: 1,
-        bitsPerSample: null,
-        sampleRate: null,
+        numberOfChannels: 2,
+        bitsPerSample: 16,
+        sampleRate: 44100,
         missingFile: false,
       };
     }).forEach((trackTemplate, index) => {

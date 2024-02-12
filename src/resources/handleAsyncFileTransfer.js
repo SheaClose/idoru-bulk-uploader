@@ -4,7 +4,6 @@ const supportsWebkitGetAsEntry =
   "webkitGetAsEntry" in DataTransferItem.prototype;
 
 export const handleAsyncFileTransfer = async (event) => {
-  console.log("/* TODO: Handle bad files messaging */");
   event.preventDefault();
   let setlist = {};
   if (!supportsFileSystemAccessAPI && !supportsWebkitGetAsEntry) return;

@@ -43,7 +43,7 @@ const songTemplate = {
       directory: "",
       duration: 0,
       channelName: "Channel 1",
-      numberOfChannels: 1,
+      numberOfChannels: 2,
       bitsPerSample: 16,
       sampleRate: 44100,
       missingFile: false,
@@ -56,7 +56,7 @@ const songTemplate = {
       directory: "",
       duration: 0,
       channelName: "Channel 2",
-      numberOfChannels: 1,
+      numberOfChannels: 2,
       bitsPerSample: 16,
       sampleRate: 44100,
       missingFile: false,
@@ -95,9 +95,9 @@ const songTemplate = {
       directory: "",
       duration: 0,
       channelName: "Channel 5",
-      numberOfChannels: 1,
-      bitsPerSample: null,
-      sampleRate: null,
+      numberOfChannels: 2,
+      bitsPerSample: 16,
+      sampleRate: 44100,
       missingFile: false,
     },
     F6: {
@@ -108,9 +108,9 @@ const songTemplate = {
       directory: "",
       duration: 0,
       channelName: "Channel 6",
-      numberOfChannels: 1,
-      bitsPerSample: null,
-      sampleRate: null,
+      numberOfChannels: 2,
+      bitsPerSample: 16,
+      sampleRate: 44100,
       missingFile: false,
     },
     F7: {
@@ -121,9 +121,9 @@ const songTemplate = {
       directory: "",
       duration: 0,
       channelName: "Channel 7",
-      numberOfChannels: 1,
-      bitsPerSample: null,
-      sampleRate: null,
+      numberOfChannels: 2,
+      bitsPerSample: 16,
+      sampleRate: 44100,
       missingFile: false,
     },
   },
@@ -533,7 +533,7 @@ export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
     directory: `#{directory}${path}`,
     duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
-    numberOfChannels: trackConfig?.numberOfChannels || 1,
+    numberOfChannels: trackConfig?.numberOfChannels || 2,
     bitsPerSample: 16,
     sampleRate: trackConfig?.sampleRate || 44100,
     missingFile: false,
@@ -607,7 +607,6 @@ export const onDrop = async (
             }
           }
           if (trackIsMidi) {
-            /* TODO: add to midi infor on song. */
             newSong.midiFile = {
               id: crypto.randomUUID(),
               fileName: track?.name,
