@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./App.css";
-import idoruLogo from "./resources/Idoru-Logo-word_Dark.png";
 import Slide from "./Components/Slide";
 import Modal from "./Components/Modal";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
@@ -84,6 +83,7 @@ function App() {
       const session = JSON.parse(text);
       if (
         !session?.session?.name ||
+        session?.session?.name === "Untitled Session" ||
         session?.session?.name === "Unnamed Session"
       ) {
         set(session, "session.name", sessionName.split(".idoru")[0]);
@@ -125,7 +125,7 @@ function App() {
       if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
         canUpload = false;
         return toast(
-          `Setlists that were created within this tool MUST have a file path to the directory. \n\nCheck Setlist named: "${playlist.name}" and verify "Path to Directory:" is filled out. \n\nSee FAQ for more info.`,
+          `Setlists that were created within this tool MUST have a file path to the directory. \n\nCheck Setlist named: "${playlist.name}" and verify "Path to Directory:" is filled out. \n\nSee /Help for more info.`,
           { duration: 7500 }
         );
       }
@@ -294,7 +294,11 @@ function App() {
 
       <nav className="w-full p-8 md:pl-16 pr-6 md:py-8 text-white bg-black flex justify-between items-center">
         <Link to="/" className="flex gap-4 items-center font-bold text-2xl">
-          <img className="h-10 w-10" src={idoruLogo} alt="Logo" />{" "}
+          <img
+            className="h-10 w-10"
+            src="https://s3.ca-central-1.amazonaws.com/assets.sheaclose.com/Idoru-Logo-word_Dark.png"
+            alt="Logo"
+          />
           <div className="flex flex-col">Idoru-P1 Bulk Uploader</div>
         </Link>
         <Slide onNavItemSelect={onNavItemSelect} />

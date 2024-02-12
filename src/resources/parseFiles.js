@@ -547,7 +547,10 @@ export const onDrop = async (
   byPassTrackMetaValidation,
   delimiter
 ) => {
-  /* TODO: update this to handle one track at a time, so there's not a long ass waiting game. */
+  /*
+    TODO:
+      update this to handle one track at a time, so there's not a long ass waiting game. 
+  */
   if (!files) return;
   let newSession;
   /* Start new Session */
@@ -627,6 +630,7 @@ export const onDrop = async (
         .forEach((track, index) => {
           const { name, data } = track || {};
           const incIndex = index + 1;
+          /* TODO: throw error if meta-data fails (bitsPerSample, sampleRate, etc) */
           set(
             newSong,
             `inputFiles[F${incIndex}]`,

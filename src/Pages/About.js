@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import p1Img from "../resources/product_top_front2x.jpeg";
 import { Link } from "react-router-dom";
 
 const About = () => {
@@ -9,7 +8,10 @@ const About = () => {
     <div className="w-auto text-white m-4 p-4 md:m-20 md:p-12 bg-[--btn] rounded-md flex flex-col gap-8 max-w-6xl break-words">
       <div
         className="relative h-80 w-full bg-[center_center] bg-no-repeat bg-cover bg-[--charcoal] rounded-xl"
-        style={{ backgroundImage: `url("${p1Img}")` }}
+        style={{
+          backgroundImage:
+            'url("https://s3.ca-central-1.amazonaws.com/assets.sheaclose.com/product_top_front2x.jpeg")',
+        }}
       >
         <div className="absolute opacity-10"></div>
       </div>

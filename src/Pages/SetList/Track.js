@@ -19,7 +19,10 @@ const Track = ({
   const { session, setSession, byPassConfirmation, setByPassConfirmation } =
     useOutletContext();
   const song = session?.songs[songIndex];
-
+  /* 
+    TODO: add disabled when number of available routing options has been met. (32?) 
+    This is based on track.numberOfChannels 
+  */
   const activeOutputs = useMemo(() => {
     return (
       Object.entries(song.outputs)?.reduce(

@@ -5,6 +5,7 @@ import App from "./App";
 import SetList from "./Pages/SetList/SetList";
 import About from "./Pages/About";
 import "./index.css";
+import Help from "./Pages/Help";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <About />,
+      },
+      {
+        path: "help",
+        element: <Help />,
       },
     ],
   },

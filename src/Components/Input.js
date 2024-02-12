@@ -41,7 +41,7 @@ const Input = ({
         </span>
       ) : null
     );
-  }, [ref.current, value]);
+  }, [ref, value]);
   useEffect(() => {
     const warning =
       value?.length > warningLength
@@ -54,7 +54,7 @@ const Input = ({
         </span>
       ) : null
     );
-  }, [value]);
+  }, [value, warningLength]);
 
   return (
     <Tooltip enterDelay={1000} title={title} leaveDelay={0}>
