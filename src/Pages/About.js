@@ -24,7 +24,7 @@ const About = () => {
         </div>
         <p>
           Simply put, this web application is a way to quickly generate a
-          setlist by dragging and dropping a Folder (seperated by song) directly
+          setlist by dragging and dropping a Folder (separated by song) directly
           into the browser window. The app will then process the the
           sub-directories automatically creating a setlist, songs, and mapping
           tracks (and some basic routing) for you.
@@ -92,12 +92,12 @@ const About = () => {
         ) : (
           <>
             <p>
-              Because of these limitations, some rather clunky comprimises have
-              had to be made, and this app is fairly prescriptive in it's usage.
+              Because of these limitations, some rather clunky compromises have
+              had to be made, and this app is fairly prescriptive in its usage.
               I have tried to make it as intuitive as is possible, however, you
               will likely need to check out the{" "}
               <Link to="/help">Help page</Link> to understand how to get the
-              most out of this app, and some basic instructions for it's use.
+              most out of this app, and some basic instructions for its use.
             </p>
             <p>
               This is very much a work in progress, so you may see some bugs. If

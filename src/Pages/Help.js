@@ -54,7 +54,7 @@ const Help = () => {
             />
           </p>
           <p>
-            From a file explorer on you system grab the root directory ("Set
+            From a file explorer on your system grab the root directory ("Set
             List" in the above photo), drag it into the browser window and drop
             it in the body of the page. On file drop, you will be provided an
             option on how to upload.
@@ -74,7 +74,7 @@ const Help = () => {
             <span className="font-semibold">Fast</span>: Depending on the number
             of files you are importing the "accurate" method can be very time
             consuming. As an alternative I have provided a fast method. The
-            benifit is that only the folder/file names will be parsed, and as
+            benefit is that only the folder/file names will be parsed, and as
             such will complete extremely quickly. The drawback is that the files
             meta-data has to be assumed. If your bit rate or sample rate are
             invalid, you will need to repeat the process. It is also assumed all
@@ -89,7 +89,7 @@ const Help = () => {
             After Importing:
           </div>
           <p>
-            If you imported your session via drag/drop, you will notice an input
+            If you import your session via drag/drop, you will notice an input
             in your setlist titled "Path to Directory:". Due to limitations of
             browsers, files imported will only include relative paths from the
             directory that is selected. In order to correctly export files into
