@@ -108,8 +108,8 @@ const About = () => {
               >
                 contact me
               </a>
-              . I very much hope to make this something that is as useful for
-              you as it is for me.
+              . I hope to make this something that is as useful for you as it is
+              for me.
             </p>
             <span
               className="-mt-6 cursor-pointer text-[--btn-text] text-sm"
