@@ -170,7 +170,6 @@ function App() {
   };
 
   const handleDroppedFilesImport = async () => {
-    /* TODO: update this to handle one track at a time, so there's not a long ass waiting game. */
     setLoading(true);
     toast(
       `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
@@ -178,20 +177,27 @@ function App() {
           Like, seriously, if the spinner's running, we're processing, go get a tea or something.`,
       { duration: 70000 }
     );
-    const { newSession, latestSetlistId } =
-      (await onDrop(
-        droppedFiles,
-        session,
-        importMethod === "fast",
-        delimiter
-      )) || {};
-    toast.remove();
-    setLoading(false);
-    if (!newSession) {
-      return;
+    try {
+      const { newSession, latestSetlistId } =
+        (await onDrop(
+          droppedFiles,
+          session,
+          importMethod === "fast",
+          delimiter
+        )) || {};
+      if (!newSession) {
+        return;
+      }
+      toast.remove();
+      ogSetSession(newSession);
+      navigate(`/setlist/${latestSetlistId}`);
+    } catch (error) {
+      toast.remove();
+      console.error("error: ", error);
+      toast.error(error?.message);
+    } finally {
+      setLoading(false);
     }
-    ogSetSession(newSession);
-    navigate(`/setlist/${latestSetlistId}`);
   };
 
   const onFrameDrop = async (event) => {

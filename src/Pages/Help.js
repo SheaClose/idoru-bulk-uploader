@@ -112,7 +112,7 @@ const Help = () => {
             then right click the pathname (titled "Where") and select "Copy as
             Pathname"
           </p>
-          <div className="flex">
+          <div className="flex flex-wrap gap-4 justify-between items-center">
             <img
               src="https://s3.ca-central-1.amazonaws.com/assets.sheaclose.com/Get+Info+Medium.jpeg"
               alt=""

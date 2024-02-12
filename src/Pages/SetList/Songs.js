@@ -98,6 +98,21 @@ const Songs = () => {
         <div ref={provided.innerRef} {...provided.droppableProps}>
           {playlist?.songs?.map((id, playlistSongIndex) => {
             const song = songsById[id];
+            const consumedChannels = Object.values(song.outputs).reduce(
+              (_acc, cur) => {
+                const total = Object.entries(cur).reduce(
+                  (acc, [outputChannelKey, { active }]) => {
+                    const mappedInput =
+                      song?.inputFiles?.["F" + outputChannelKey.split("IN")[1]]
+                        ?.numberOfChannels;
+                    return acc + (active ? mappedInput : 0);
+                  },
+                  0
+                );
+                return _acc + total;
+              },
+              0
+            );
             const songIndex = session.songs.findIndex(
               (_song) => _song.id === id
             );
@@ -252,12 +267,21 @@ const Songs = () => {
                                     );
                                   }}
                                 />
+                                <div className="flex flex-col justify-end text-xs">
+                                  <span className="text-[--btn-text-hover] font-semibold">
+                                    {consumedChannels}/32
+                                  </span>
+                                  <span className="text-[--btn-text]">
+                                    CONNECTIONS USED
+                                  </span>
+                                </div>
                               </div>
                               {Object.entries(song.inputFiles)
                                 // .slice(0, 6)
                                 .map(([songFileId, inputFile], index) => {
                                   return (
                                     <Track
+                                      consumedChannels={consumedChannels}
                                       disabled={index > 5}
                                       trackIndex={index}
                                       inputId={`IN${index + 1}`}

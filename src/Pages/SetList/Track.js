@@ -15,14 +15,11 @@ const Track = ({
   songIndex,
   disabled = false,
   trackIndex,
+  consumedChannels,
 }) => {
   const { session, setSession, byPassConfirmation, setByPassConfirmation } =
     useOutletContext();
   const song = session?.songs[songIndex];
-  /* 
-    TODO: add disabled when number of available routing options has been met. (32?) 
-    This is based on track.numberOfChannels 
-  */
   const activeOutputs = useMemo(() => {
     return (
       Object.entries(song.outputs)?.reduce(
@@ -38,6 +35,14 @@ const Track = ({
   }, [song, inputId]);
 
   const handleSetCheckBoxValue = (checkBoxName, checked) => {
+    const numberOfChannels = song?.inputFiles?.[songFileId]?.numberOfChannels;
+    const newConsumedChannels = checked
+      ? consumedChannels + numberOfChannels
+      : consumedChannels - numberOfChannels;
+    if (newConsumedChannels > 32)
+      return toast.error(
+        "This operation would exceed number of available channels. You must deselect other output routings before you can continue"
+      );
     setSession([
       [
         `songs[${songIndex}].outputs.${checkBoxName}.${inputId}.active`,

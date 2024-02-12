@@ -547,10 +547,6 @@ export const onDrop = async (
   byPassTrackMetaValidation,
   delimiter
 ) => {
-  /*
-    TODO:
-      update this to handle one track at a time, so there's not a long ass waiting game. 
-  */
   if (!files) return;
   let newSession;
   /* Start new Session */
@@ -630,7 +626,10 @@ export const onDrop = async (
         .forEach((track, index) => {
           const { name, data } = track || {};
           const incIndex = index + 1;
-          /* TODO: throw error if meta-data fails (bitsPerSample, sampleRate, etc) */
+          if (data.sampleRate !== 44100 || data.bitsPerSample !== 16)
+            throw new Error(
+              "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
+            );
           set(
             newSong,
             `inputFiles[F${incIndex}]`,
