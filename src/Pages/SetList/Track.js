@@ -34,8 +34,8 @@ const Track = ({
     );
   }, [song, inputId]);
 
+  const numberOfChannels = song?.inputFiles?.[songFileId]?.numberOfChannels;
   const handleSetCheckBoxValue = (checkBoxName, checked) => {
-    const numberOfChannels = song?.inputFiles?.[songFileId]?.numberOfChannels;
     const newConsumedChannels = checked
       ? consumedChannels + numberOfChannels
       : consumedChannels - numberOfChannels;
@@ -209,7 +209,15 @@ const Track = ({
                           {spanChild ? spanChild : `${index}.`}
                         </span>
                         <Checkbox
-                          disabled={trackDisbaled}
+                          disabled={
+                            trackDisbaled ||
+                            /* 
+                              If checking this box would put you over limit,
+                              don't allow it to be selected 
+                            */
+                            (!activeOutputs[checkBoxName] &&
+                              numberOfChannels + consumedChannels > 32)
+                          }
                           checkboxName={checkBoxName}
                           isChecked={activeOutputs[checkBoxName]}
                           onChecked={handleSetCheckBoxValue}
