@@ -507,6 +507,7 @@ const addPlaylistToSession = (session, setlistName) => {
   const playlist = cloneDeep(playlistTemplate);
   playlist.id = crypto.randomUUID();
   playlist.name = setlistName;
+  playlist.directoryName = setlistName;
   session.session.playlists.push(playlist.id);
   session.playlists.push(playlist);
   return playlist.id;
@@ -515,6 +516,7 @@ const addPlaylistToSession = (session, setlistName) => {
 const generateNewSong = (name) => {
   const song = cloneDeep(songTemplate);
   song.id = crypto.randomUUID();
+  song.directoryName = name;
   song.name = name;
   return song;
 };
@@ -524,13 +526,13 @@ const addSongToSession = (session, playlistIndex, song) => {
   session.songs.push(song);
 };
 
-export const generateNewTrack = (index, fileName = "", path, trackConfig) => {
+export const generateNewTrack = (index, fileName = "", trackConfig) => {
   const track = {
     id: crypto.randomUUID(),
     displayName: `F${index}`,
     songFile: "",
     fileName: fileName,
-    directory: `#{directory}${path}`,
+    directory: "",
     duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
     numberOfChannels: trackConfig?.numberOfChannels || 2,
@@ -609,7 +611,7 @@ export const onDrop = async (
             newSong.midiFile = {
               id: crypto.randomUUID(),
               fileName: track?.name,
-              filePath: `#{directory}${setlistName}${delimiter}${songName}${delimiter}${track.name}`,
+              filePath: null,
             };
           }
         })
@@ -634,12 +636,7 @@ export const onDrop = async (
           set(
             newSong,
             `inputFiles[F${incIndex}]`,
-            generateNewTrack(
-              incIndex,
-              name,
-              `${setlistName}${delimiter}${songName}${delimiter}${name}`,
-              data
-            )
+            generateNewTrack(incIndex, name, data)
           );
           if (incIndex > 6) return;
           set(

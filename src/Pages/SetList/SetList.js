@@ -94,6 +94,11 @@ const PlayList = () => {
             />
           </FormFieldWrapper>
         </div>
+        {/* 
+          playlist.filePath is a property generated locally, it's presence indicates the setlist was
+          by the bulk-uploader. Thus, a directory string must be provided by the end-user in order to
+          export a session.
+         */}
         {playlist?.hasOwnProperty("filePath") ? (
           <div className="flex items-center gap-4">
             <Folder />

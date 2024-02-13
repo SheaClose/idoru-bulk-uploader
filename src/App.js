@@ -123,6 +123,13 @@ function App() {
     let canUpload = true;
     session.playlists.forEach((playlist, playlistIndex) => {
       if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
+        console.info("playlist: ", playlist);
+        console.info(
+          "playlist has filePath: ",
+          playlist.hasOwnProperty("filePath")
+        );
+        console.info("playlist.filePath: ", playlist.filePath);
+
         canUpload = false;
         return toast(
           `Setlists that were created within this tool MUST have a file path to the directory. \n\nCheck Setlist named: "${playlist.name}" and verify "Path to Directory:" is filled out. \n\nSee /Help for more info.`,
@@ -131,8 +138,10 @@ function App() {
       }
       playlist.songs.forEach((songId) => {
         const song = songsById[songId];
+        /* For now, not allowing aux track mapping, maybe in the future */
         const newF7 = generateNewTrack(7);
         newF7.directory = "";
+        /* generate filePaths for inputTracks */
         song.inputFiles = Object.entries(song.inputFiles)
           .sort((a, z) => {
             const aNum = +a?.[0]?.split?.("F")?.[1];
@@ -143,18 +152,21 @@ function App() {
           })
           .slice(0, 6)
           .reduce((acc, [key, val]) => {
-            val.directory = val.directory.replace(
-              "#{directory}",
-              session?.playlists?.[playlistIndex]?.filePath
-            );
+            val.directory = `${session?.playlists?.[playlistIndex]?.filePath}${session?.playlists?.[playlistIndex]?.directoryName}${delimiter}${song?.directoryName}${delimiter}${val?.fileName}`;
             return { ...acc, [key]: val };
           }, {});
+        /* generate filePaths for Midi */
+        if (song?.midiFile?.fileName) {
+          song.midiFile.filePath = `${session?.playlists?.[playlistIndex]?.filePath}${session?.playlists?.[playlistIndex]?.directoryName}${delimiter}${song?.directoryName}${delimiter}${song?.midiFile?.fileName}`;
+        }
+
+        /* after song has been mapped, overwrite Aux track (F7) */
         song.inputFiles["F7"] = newF7;
       });
     });
     /* END cleanup */
     if (!canUpload) return;
-    /* Verify Values?  */
+
     const fileName = `${session?.session?.name || "Untitled Session"}.idoru`;
     var element = document.createElement("a");
     element.setAttribute(
