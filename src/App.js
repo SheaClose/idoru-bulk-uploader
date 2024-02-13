@@ -5,7 +5,7 @@ import Modal from "./Components/Modal";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
 import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
-import { set } from "lodash";
+import { keyBy, set } from "lodash";
 import { FileDrop } from "react-file-drop";
 import { onDrop, generateNewTrack } from "./resources/parseFiles";
 import { handleAsyncFileTransfer } from "./resources/handleAsyncFileTransfer";
@@ -67,10 +67,7 @@ function App() {
 
   const songsById = useMemo(() => {
     if (!session?.songs) return;
-    const songsById = session.songs.reduce((acc, song) => {
-      return { ...acc, [song.id]: song };
-    }, {});
-    return songsById;
+    return keyBy(session.songs, "id");
   }, [session?.songs]);
 
   const handleImport = (e) => {
@@ -103,7 +100,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onDragEnd = ({ source, destination }) => {
+  const onSongDragEnd = ({ source, destination }) => {
     const sourceIndex = source?.index;
     const destinationIndex = destination?.index;
     // something went wrong, abandon ship!
@@ -181,7 +178,7 @@ function App() {
     document.body.removeChild(element);
   };
 
-  const handleDroppedFilesImport = async () => {
+  const processDroppedSetlist = async () => {
     setLoading(true);
     toast(
       `Depending on how many songs you're adding, this may take a moment, please be patient, JavaSconcript is trying it's best..
@@ -191,12 +188,7 @@ function App() {
     );
     try {
       const { newSession, latestSetlistId } =
-        (await onDrop(
-          droppedFiles,
-          session,
-          importMethod === "fast",
-          delimiter
-        )) || {};
+        (await onDrop(droppedFiles, session, importMethod === "fast")) || {};
       if (!newSession) {
         return;
       }
@@ -212,7 +204,7 @@ function App() {
     }
   };
 
-  const onFrameDrop = async (event) => {
+  const onDroppedSetlist = async (event) => {
     setDroppedFiles(await handleAsyncFileTransfer(event));
     return setModalIsOpen(true);
   };
@@ -262,7 +254,7 @@ function App() {
         isOpen={modalIsOpen}
         onConfirm={() => {
           setModalIsOpen(false);
-          handleDroppedFilesImport();
+          processDroppedSetlist();
         }}
         onCancel={() => setModalIsOpen(false)}
         header="How do you want to upload?"
@@ -321,8 +313,8 @@ function App() {
         </Link>
         <Slide onNavItemSelect={onNavItemSelect} />
       </nav>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <FileDrop onFrameDrop={onFrameDrop}>
+      <DragDropContext onDragEnd={onSongDragEnd}>
+        <FileDrop onFrameDrop={onDroppedSetlist}>
           <FormFieldWrapper
             id="end-of-song"
             className="w-full"

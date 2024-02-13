@@ -532,7 +532,7 @@ export const generateNewTrack = (index, fileName = "", trackConfig) => {
     displayName: `F${index}`,
     songFile: "",
     fileName: fileName,
-    directory: "",
+    directory: "", // this will be defined on Export
     duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
     numberOfChannels: trackConfig?.numberOfChannels || 2,
@@ -543,12 +543,7 @@ export const generateNewTrack = (index, fileName = "", trackConfig) => {
   return track;
 };
 
-export const onDrop = async (
-  files,
-  session,
-  byPassTrackMetaValidation,
-  delimiter
-) => {
+export const onDrop = async (files, session, byPassTrackMetaValidation) => {
   if (!files) return;
   let newSession;
   /* Start new Session */
@@ -576,8 +571,7 @@ export const onDrop = async (
         tracks.map(async (track) => {
           const trackIsAudio = track.name.toLowerCase().includes(".wav");
           const trackIsMidi = track.name.toLowerCase().includes(".mid");
-          /* ignore any further directories, focus only on files */
-          /* Only accept .wav files */
+          /* ignore any further directories, focus only on .wav(e)/.mid(i) files */
           if (track?.kind !== "file" || !(trackIsAudio || trackIsMidi)) {
             return;
           }
@@ -602,25 +596,6 @@ export const onDrop = async (
                     });
                   });
                 };
-
-                // const audioContext = new AudioContext();
-                // const reader = new FileReader();
-                // function decodedDone(decoded) {
-                //   new Float32Array(decoded.length);
-                //   decoded.getChannelData(0);
-                // }
-                // reader.onload = async function () {
-                //   const arrayBuffer = reader.result;
-                //   const decodedData = await audioContext.decodeAudioData(
-                //     arrayBuffer,
-                //     decodedDone
-                //   );
-                //   res({
-                //     name: track.name,
-                //     data: decodedData,
-                //   });
-                // };
-                // reader.readAsArrayBuffer(trackFile);
               });
             }
           }
@@ -645,21 +620,29 @@ export const onDrop = async (
         .forEach((track, index) => {
           const { name, data, trackFile } = track || {};
           const incIndex = index + 1;
-          // this is an estimation, but appears to be working correctly;
-          data.bitsPerSample = Math.floor(
-            (8 * trackFile.size) / data.length / data.numberOfChannels
-          );
+          if (!byPassTrackMetaValidation) {
+            const errorMsg =
+              "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files.";
+            try {
+              // this is an estimation, but appears to be working correctly;
+              data.bitsPerSample = Math.floor(
+                (8 * trackFile?.size) / data?.length / data?.numberOfChannels
+              );
+            } catch (error) {
+              throw new Error(errorMsg);
+            }
 
-          if (data.sampleRate !== 44100 || data.bitsPerSample !== 16) {
-            throw new Error(
-              "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
-            );
+            if (data.sampleRate !== 44100 || data.bitsPerSample !== 16) {
+              throw new Error(errorMsg);
+            }
           }
           set(
             newSong,
             `inputFiles[F${incIndex}]`,
             generateNewTrack(incIndex, name, data)
           );
+
+          /* do not assign inputFiles above input 6 to an output. */
           if (incIndex > 6) return;
           set(
             newSong,

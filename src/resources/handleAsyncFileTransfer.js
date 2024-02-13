@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 const supportsFileSystemAccessAPI =
   "getAsFileSystemHandle" in DataTransferItem.prototype;
 const supportsWebkitGetAsEntry =
@@ -13,10 +15,14 @@ export const handleAsyncFileTransfer = async (event) => {
   const _setlist = await (supportsFileSystemAccessAPI
     ? item.getAsFileSystemHandle()
     : item.webkitGetAsEntry());
-  if (_setlist?.kind !== "directory") return;
+  if (_setlist?.kind !== "directory")
+    return toast.error(
+      "This app does not currently support importing files, See /help for more information on how to correctly use this application"
+    );
   setlistName = _setlist?.name;
   setlist.name = setlistName;
   for await (const song of _setlist?.values()) {
+    /* ignore files in "song" level of parsing */
     if (song?.kind !== "directory") continue;
     setlist[song.name] = [];
     for await (const track of song.values()) {

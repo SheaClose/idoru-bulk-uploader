@@ -69,24 +69,33 @@ const Songs = () => {
     const displayNamePaths = trackKeys.map(
       (track) => `inputFiles.${track}.displayName`
     );
-    navigator.clipboard.writeText(
+    localStorage.setItem(
+      "songConfiguration",
       JSON.stringify(pick(song, ["endOfSong", ...displayNamePaths, "outputs"]))
     );
-    toast.success("Copied Song Configuration to Clipboard!");
+    toast.success("Copied Song Configuration to Clipboard!", {
+      duration: 2000,
+    });
   };
 
   const handlePaste = async (song, songIndex) => {
     try {
       const targetSong = cloneDeep(song);
-      const text = await navigator.clipboard.readText();
-      const sourceSongConfiguration = JSON.parse(text);
+      const sourceSongConfiguration = JSON.parse(
+        localStorage.getItem("songConfiguration")
+      );
+      if (!sourceSongConfiguration) {
+        throw new Error(
+          "Invalid JSON: Unable to read source song configuration, likely none has been copied."
+        );
+      }
       const mergedSong = merge(targetSong, sourceSongConfiguration);
       setSession(`songs[${songIndex}]`, mergedSong);
     } catch (error) {
       console.warn("error: ", error?.message);
-      if (error?.message.includes("not valid JSON"))
+      if (error?.message.includes("Invalid JSON"))
         return toast.error(
-          "Invalid song configuration pasted. \n\n You might have copied something else to your clipboard, try copying and pasting again",
+          "Invalid song configuration pasted. \n\n You might not have copied a valid song configuration, try copying and pasting again",
           { duration: 5000 }
         );
       toast.error("Something went wrong!");
