@@ -536,7 +536,7 @@ export const generateNewTrack = (index, fileName = "", trackConfig) => {
     duration: trackConfig?.duration || 0,
     channelName: `Channel ${index}`,
     numberOfChannels: trackConfig?.numberOfChannels || 2,
-    bitsPerSample: 16,
+    bitsPerSample: trackConfig?.bitsPerSample || 16,
     sampleRate: trackConfig?.sampleRate || 44100,
     missingFile: false,
   };
@@ -587,23 +587,40 @@ export const onDrop = async (
             } else {
               const trackFile = await track.getFile();
               return new Promise((res, rej) => {
-                const audioContext = new AudioContext();
                 const reader = new FileReader();
-                function decodedDone(decoded) {
-                  new Float32Array(decoded.length);
-                  decoded.getChannelData(0);
-                }
-                reader.onload = async function () {
-                  const arrayBuffer = reader.result;
-                  res({
-                    name: track.name,
-                    data: await audioContext.decodeAudioData(
-                      arrayBuffer,
-                      decodedDone
-                    ),
+                reader.readAsArrayBuffer(trackFile);
+                reader.onload = function (event) {
+                  let buffer = reader.result;
+                  let AudioContext =
+                    window.AudioContext || window.webkitAudioContext;
+                  let context = new AudioContext();
+                  context.decodeAudioData(buffer, function (decodedData) {
+                    res({
+                      name: track.name,
+                      data: decodedData,
+                      trackFile,
+                    });
                   });
                 };
-                reader.readAsArrayBuffer(trackFile);
+
+                // const audioContext = new AudioContext();
+                // const reader = new FileReader();
+                // function decodedDone(decoded) {
+                //   new Float32Array(decoded.length);
+                //   decoded.getChannelData(0);
+                // }
+                // reader.onload = async function () {
+                //   const arrayBuffer = reader.result;
+                //   const decodedData = await audioContext.decodeAudioData(
+                //     arrayBuffer,
+                //     decodedDone
+                //   );
+                //   res({
+                //     name: track.name,
+                //     data: decodedData,
+                //   });
+                // };
+                // reader.readAsArrayBuffer(trackFile);
               });
             }
           }
@@ -626,13 +643,18 @@ export const onDrop = async (
           return a.name.toLowerCase().localeCompare(z.name.toLowerCase());
         })
         .forEach((track, index) => {
-          const { name, data } = track || {};
+          const { name, data, trackFile } = track || {};
           const incIndex = index + 1;
-          /* TODO: This aint working now... why?  */
-          // if (data.sampleRate !== 44100 || data.bitsPerSample !== 16)
-          //   throw new Error(
-          //     "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
-          //   );
+          // this is an estimation, but appears to be working correctly;
+          data.bitsPerSample = Math.floor(
+            (8 * trackFile.size) / data.length / data.numberOfChannels
+          );
+
+          if (data.sampleRate !== 44100 || data.bitsPerSample !== 16) {
+            throw new Error(
+              "Sample rate or Bit rate invalid: verify all tracks are 16 bit - 44.1k sample rate .wav files."
+            );
+          }
           set(
             newSong,
             `inputFiles[F${incIndex}]`,
