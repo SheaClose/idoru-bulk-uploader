@@ -119,7 +119,13 @@ function App() {
   const handleExport = () => {
     let canUpload = true;
     session.playlists.forEach((playlist, playlistIndex) => {
-      if (playlist.hasOwnProperty("filePath") && !playlist.filePath) {
+      if (!playlist.hasOwnProperty("filePath")) {
+        /* This is a setlist imported from the Idoru app, no need to process file paths */
+        return;
+      }
+      /* TODO: may need to rename `filePath` to `internalFilePath` for clarity */
+      if (!playlist.filePath) {
+        /* This is a drag/drop setlist, need to process filePaths, but can't as none is provided. */
         console.info("playlist: ", playlist);
         console.info(
           "playlist has filePath: ",
