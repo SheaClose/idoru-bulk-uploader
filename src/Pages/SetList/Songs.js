@@ -107,6 +107,7 @@ const Songs = () => {
         <div ref={provided.innerRef} {...provided.droppableProps}>
           {playlist?.songs?.map((id, playlistSongIndex) => {
             const song = songsById[id];
+            if (!song) return;
             const consumedChannels = Object.values(song.outputs).reduce(
               (_acc, cur) => {
                 const total = Object.entries(cur).reduce(

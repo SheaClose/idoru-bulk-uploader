@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../Components/Input";
 import Button from "../../Components/Button";
 import FormFieldWrapper from "../../Components/FormFieldWrapper";
-import { Playlist, Folder, Delete } from "../../Components/Icons";
+import { Playlist, Folder, Delete, Copy } from "../../Components/Icons";
 import { useOutletContext } from "react-router-dom";
 import Songs from "./Songs";
 import toast from "react-hot-toast";
+import { cloneDeep } from "lodash";
 
 const PlayList = () => {
   let { playListId } = useParams();
@@ -17,6 +18,7 @@ const PlayList = () => {
     byPassConfirmation,
     setByPassConfirmation,
     delimiter,
+    songsById,
   } = useOutletContext();
   const playlistIndex = session?.playlists?.findIndex(
     ({ id }) => id === playListId
@@ -40,29 +42,88 @@ const PlayList = () => {
     const newPlaylistId = session?.session?.playlists[0];
     navigate(newPlaylistId ? `/setlist/${newPlaylistId}` : "/");
   };
+  const handleSetListCopy = () => {
+    const newSession = cloneDeep(session);
+    /* Create New setlist from selected set list */
+    const newPlaylist = cloneDeep(playlist);
+    newPlaylist.id = crypto.randomUUID();
+    newPlaylist.name = `${playlist.name} (Copy)`;
 
+    /* add setlist to session */
+    newSession.session.playlists.push(newPlaylist.id);
+    newSession.playlists.push(newPlaylist);
+
+    /* Create new songs from songs associated with this setlist, add them to songs/setlist */
+    const newSongs = playlist.songs.map((songId) => {
+      const newSong = cloneDeep(songsById[songId]);
+      /* Create new song id */
+      newSong.id = crypto.randomUUID();
+      return newSong;
+    });
+    newSession.playlists[session.playlists.length - 1].songs = newSongs.map(
+      ({ id }) => id
+    );
+    newSession.songs.push(...newSongs);
+    setSession("", newSession);
+    navigate(`/setlist/${newPlaylist.id}`);
+  };
+  const handleRemoveSetList = () => {
+    const newSession = cloneDeep(session);
+    /* remove setlist from session */
+    newSession.session.playlists = newSession.session.playlists.filter(
+      (id) => id !== playListId
+    );
+    newSession.playlists = newSession.playlists.filter(
+      (playlist) => playlist.id !== playListId
+    );
+
+    /* Filter out songs related to this setlist */
+    const newSongs = newSession.songs.filter(
+      ({ id }) => !playlist.songs.includes(id)
+    );
+    newSession.songs = newSongs;
+    setSession("", newSession);
+    navigate(
+      `/setlist/${newSession?.playlists?.[newSession.playlists.length - 1]?.id}`
+    );
+  };
   return (
     <div className="w-full text-white p-8">
       {session?.playlists?.length ? (
-        <div className="flex justify-between mt-[-1rem] mb-8">
-          <select
-            id="end-of-song"
-            name="play-next"
-            className="py-4 pl-1 pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] w-96 rounded-md text-white"
-            value={playListId || ""}
-            onChange={(e) => {
-              navigate(`/setlist/${e.target.value}`);
-            }}
-          >
-            <option disabled key={"null"} value="">
-              Set Lists
-            </option>
-            {session?.playlists?.map((playlist) => (
-              <option key={playlist?.id} value={playlist?.id}>
-                {playlist?.name}{" "}
+        <div className="flex justify-between mt-[-1rem] mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <Playlist />
+            <select
+              id="end-of-song"
+              name="play-next"
+              className="py-4 pl-1 pr-[2px] border-r-[8px] border-r-transparent bg-[--btn] w-96 rounded-md text-white"
+              value={playListId || ""}
+              onChange={(e) => {
+                navigate(`/setlist/${e.target.value}`);
+              }}
+            >
+              <option disabled key={"null"} value="">
+                Set Lists
               </option>
-            ))}
-          </select>
+              {session?.playlists?.map((playlist) => (
+                <option key={playlist?.id} value={playlist?.id}>
+                  {playlist?.name}{" "}
+                </option>
+              ))}
+            </select>
+            <Button
+              title="Duplicate current Set List"
+              theme="actionButton"
+              label={<Copy />}
+              onClick={handleSetListCopy}
+            />
+            <Button
+              title="Duplicate current Set List"
+              theme="actionButton"
+              label={<Delete />}
+              onClick={handleRemoveSetList}
+            />
+          </div>
           <div className="w-full flex justify-end">
             <FormFieldWrapper id="session-name">
               <Input

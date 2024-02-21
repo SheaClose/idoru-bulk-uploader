@@ -3,7 +3,6 @@ import "./App.css";
 import Slide from "./Components/Slide";
 import Modal from "./Components/Modal";
 import { useLocation, useParams, useNavigate, Outlet } from "react-router-dom";
-import FormFieldWrapper from "./Components/FormFieldWrapper";
 import { DragDropContext } from "react-beautiful-dnd";
 import { keyBy, set } from "lodash";
 import { FileDrop } from "react-file-drop";
@@ -321,10 +320,6 @@ function App() {
       </nav>
       <DragDropContext onDragEnd={onSongDragEnd}>
         <FileDrop onFrameDrop={onDroppedSetlist}>
-          <FormFieldWrapper
-            id="end-of-song"
-            className="w-full"
-          ></FormFieldWrapper>
           <Outlet
             context={{
               session,

@@ -22,7 +22,7 @@ const Track = ({
   const song = session?.songs[songIndex];
   const activeOutputs = useMemo(() => {
     return (
-      Object.entries(song.outputs)?.reduce(
+      Object.entries(song?.outputs || {})?.reduce(
         (acc, [outputName, outputConfig]) => {
           return {
             ...acc,
@@ -130,7 +130,7 @@ const Track = ({
 
       // if no track, clear all outputs referencing of this track
       if (!track?.fileName) {
-        Object.values(song.outputs).forEach((output) => {
+        Object.values(song?.outputs || {}).forEach((output) => {
           output[`IN${incIndex}`].active = false;
         });
       }
